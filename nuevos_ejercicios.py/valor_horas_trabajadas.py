@@ -10,8 +10,7 @@ if sueldo_bruto<1800000:
     print("salario a pagares: ",salario_a_pagar)
     print("tiene bono de transporte de: ",bono_transporte)
 else:
-    sueldo_bruto>1800000
-    bono_transporte="no aplica bono ransporte"
+    bono_transporte="no aplica bono transporte"
     print("su sueldo es: ",sueldo_bruto)
     print("descuento de renta es: ",descuento)
     print("salario a pagares: ",salario_a_pagar)
