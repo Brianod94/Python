@@ -4,9 +4,18 @@ sueldo_bruto=valor_horas*hras_trabajadas
 descuento=sueldo_bruto*0.1
 salario_a_pagar=sueldo_bruto-descuento        
 if sueldo_bruto<1800000:
+    bono_transporte=105000
     print("su sueldo es: ",sueldo_bruto)
     print("descuento de renta es: ",descuento)
     print("salario a pagares: ",salario_a_pagar)
-    print("tiene bono de transporte de 105.000")
-else:("ganas mucha plata")
+    print("tiene bono de transporte de: ",bono_transporte)
+else:
+    sueldo_bruto>1800000
+    bono_transporte="no aplica bono ransporte"
+    print("su sueldo es: ",sueldo_bruto)
+    print("descuento de renta es: ",descuento)
+    print("salario a pagares: ",salario_a_pagar)
+    print("tiene bono de transporte de: ",bono_transporte)
+
+    
 
