@@ -4,4 +4,5 @@ if numero1>numero2:
     print("este numero es mayor",numero1)
 elif numero2>numero1:
     print("este numero es mayor",numero2)
-else:print("ambos son iguales")
+else:
+    print("ambos son iguales")
