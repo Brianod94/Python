@@ -9,3 +9,6 @@ descuento3=Salario_basico*Fondo_solidaridad
 Total_descuento=descuento1+descuento2+descuento3
 Salario_pagar=Salario_basico-Total_descuento
 print("salario a pagar es: ", Salario_pagar)
+print("seguridad social: ",descuento1)
+print("ahorro de empleados: ",descuento2)
+print("fondo de solidaridad: ", descuento3)

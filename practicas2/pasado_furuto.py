@@ -4,8 +4,8 @@ año1=int(input("¿en que año actual?"))
 año2=int(input("ingresa un año cualquiera"))
 diferencia= año1-año2
 if diferencia>0:
-    print("falta ", diferencia +"años para llegar",año2)
+    print("falta "+ str(diferencia) +" años para llegar"+str(año2))
 elif diferencia<0:
-    print("han pasado", diferencia + "años desde el año.",año2)
+    print("han pasado"+ str(diferencia) + " años desde el año."+str(año2))
 else:
     print("es el mismo año")

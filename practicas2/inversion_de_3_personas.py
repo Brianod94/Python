@@ -16,6 +16,6 @@ porcentaje2=(inversion2/total_inversion)*100
 porcentaje3=(inversion3/total_inversion)*100
 #imprime los nombres de cada 1 de ellos
 print("costo total de inversion fue: ",total_inversion)
-print("su nombre es:", nombre1 +"su inversion fue de: ",porcentaje1)
-print("su nombre es:", nombre2 +"su inversion fue de: ",porcentaje2)
-print("su nombre es:", nombre3 +"su inversion fue de: ",porcentaje3)
+print("su nombre es:", nombre1 +"su inversion fue de: ",round(porcentaje1,2),"%")
+print("su nombre es:", nombre2 +"su inversion fue de: ",round(porcentaje2,2),"%")
+print("su nombre es:", nombre3 +"su inversion fue de: ",round(porcentaje3,2),"%")
