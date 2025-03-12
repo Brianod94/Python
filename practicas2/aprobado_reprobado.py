@@ -5,14 +5,17 @@
 	#15% de la calificación de un trabajo final
 notas_paciales1=float(input("ingrese 1ra nota: = "))
 notas_paciales2=float(input("ingrese 2da nota: = "))
-notas_paciales3=float(input("ingrese 3ra nota: = "))   
+notas_paciales3=float(input("ingrese 3ra nota: = ")) 
+
 examen_final=float(input("nota de examen final: = "))  #nota del examen final
 trabajo_final=float(input("nota trabajo final: = "))   #nota del trabajo final
 promedio_parcial=(notas_paciales1+notas_paciales2+notas_paciales3)/3 #sumatoria de la notas parciales
+
 promedio_final=(promedio_parcial*0.55)	#
 nota_exa_final=(examen_final*0.3)		#calificaciones con su respectivo porcentaje
 notas_trab_fin=(trabajo_final*0.15)		#
 calificacion_final=promedio_final+nota_exa_final+notas_trab_fin	#sumatoria de los porcentajes
+
 if calificacion_final>3:
     print("has aprobado la materia")
 else: 
