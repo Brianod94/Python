@@ -12,3 +12,14 @@ while x<10:
     x+=1
 
 print("Fin.")
+
+#ejemplo clases
+sum=0
+e=1
+while e<=4:
+    edad=int(input("edad"))
+    sum=sum+edad
+    e=e+1
+prom=sum/4
+
+print("su promedios es:", prom)
