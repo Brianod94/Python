@@ -1,12 +1,14 @@
 while True:
-    print("Bienvenido a Pizza Bella Napoli")
+    print("*****************************************************")
+    print("**********Bienvenido a Pizza Bella Napoli************")
     print("¿Ingrese numero del Tipo pizza que desea ordenar?")# \n1. vegetariana\n2. No vegetariana\n3. Salir")
     print("1. Vegetariana.")
     print("2. No vegetariana.")
     print("3. Salir")
+    print("*****************************************************")
     tipo= input("¿opcion? = ")
-    print("gracias por su visita")
     
+    print("gracias por su visita")
     #desicion sobre el tipo de pizza 
     if tipo =="1":
         print("ingrese el numero del ingrediente adicional\n1. pimiento\n2. tufo")
