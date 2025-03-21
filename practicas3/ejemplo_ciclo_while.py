@@ -1,13 +1,13 @@
 #ejemplo 1
-x=1
-while x<3:
+x=100
+while x>0:
     print(x)
-    x+=1
+    x-=3
 print("fin.")
 
 #ejemplo 2
 x=1
-while x<10:
+while x<2:
     print("Brian")
     x+=1
 
