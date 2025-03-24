@@ -25,6 +25,7 @@ while contador < total_estudiantes:
             suma_repro=suma_repro+nota
 
         contador += 1 
+        suma_total= (suma_apro+suma_repro)/total_estudiantes
 print(f"total de estudiantes es: {total_estudiantes}")
 print(f"total de aprobados {aprobados}")
 print(f"total reprobados es: {reprobados}")
@@ -32,3 +33,4 @@ if aprobados!=0:
     print(f"promedio de aprobados {round(suma_apro/aprobados,2)}")
 if reprobados!=0:
     print(f"promedio de reprobados {round(suma_repro/reprobados,2)}")
+print(f"promedio total curso es: {suma_total}")

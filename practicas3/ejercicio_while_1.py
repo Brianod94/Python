@@ -9,3 +9,18 @@ while x<11:
     x+=1
 
 print("fin.")
+
+# edades 
+edad=int(input("cual es su edad: "))
+x=0
+while x < edad:
+    x+=1 
+    print(f"has cumplido {x} años")
+
+# tablas de mltiplicar
+tabla=int(input("ingrese tabla a multiplicar: "))
+contador=0
+while contador<=10:
+    resultado = tabla*contador 
+    print(tabla,"*",contador,"=",resultado )
+    contador+=1
