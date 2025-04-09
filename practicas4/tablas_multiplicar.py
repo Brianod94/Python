@@ -12,12 +12,12 @@
         #print("el numero debe ser mayor que 0.")
 
 # otra solucion para este codigo es.
-numero=int(input("que tabla desea saber es: "))
-
-limite=10
-i=1
-while i <=limite:
-    resultado= i*numero
-    print(f"{i} x {numero}= {resultado}")
-    i+=1
+#numero=int(input("que tabla desea saber es: "))
+#
+#limite=10
+#i=1
+#while i <=limite:
+    #resultado= i*numero
+    #print(f"{i} x {numero}= {resultado}")
+    #i+=1
 

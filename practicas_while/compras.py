@@ -9,6 +9,6 @@ while salir== 1:
     print(f"acumulado. {total_catidad}\n")
 
     salir=int(input("¿desea seguir comprando?.\n1. si\n2. no\n!opcion¡: ")) 
-    if salir==2: 
-        print(f"total compra es: {total_catidad}")   
+    if salir==2:
+        print(f"total compra es: {total_catidad}")
     
