@@ -21,5 +21,12 @@
     #print(f"{i} x {numero}= {resultado}")
     #i+=1
 
-camiseta=["azul","l",100,10]
-print(f" la camiseta tiene estos atrbutos: {camiseta}")
+j=1
+while j<=10:
+    i=1 
+    while i <= 10:
+        print(f"{j} * {i} = {j*i}")
+        
+        i+=1 
+    j+=1
+    print("===============================")
