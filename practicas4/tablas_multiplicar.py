@@ -21,3 +21,5 @@
     #print(f"{i} x {numero}= {resultado}")
     #i+=1
 
+camiseta=["azul","l",100,10]
+print(f" la camiseta tiene estos atrbutos: {camiseta}")
