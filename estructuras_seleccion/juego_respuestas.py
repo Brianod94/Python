@@ -9,6 +9,6 @@ if uno == "si":
         else:
             print("¡incorrecto! FIN DEL JUEGO")
     else:
-        print("¡incorrecto! perdiste")    
+        print("¡incorrecto! FIN DEL JUEGO")    
 else:
-     print("¡incorrecto! perdiste") 
+     print("¡incorrecto! FIN DEL JUEGO")
