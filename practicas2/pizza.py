@@ -8,7 +8,7 @@ while True:
     print("*****************************************************")
     tipo= input("¿opcion? = ")
     
-    print("gracias por su visita")
+    
     #desicion sobre el tipo de pizza 
     if tipo =="1":
         print("ingrese el numero del ingrediente adicional\n[1] pimiento\n[2] tufo")
@@ -33,5 +33,6 @@ while True:
             print("\n!ERROR¡ ingrediente no encontrado\n")
         
     else:
-        
-        print("GRACIAS POR SU VISITA")
+        print ("esta opcion no esta disponible")
+
+    
