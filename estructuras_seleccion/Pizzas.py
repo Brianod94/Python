@@ -14,10 +14,10 @@ while opciones != "3":
     opciones = input("¿Opcion? = ")
     
     #desicion sobre el tipo de pizza 
-    if opciones =="1":
+    if opciones =="1": # opcion 1 vegetariana 
         print("Ingrese el numero del ingrediente adicional\n\n[1] Pimiento🫑\n[2] Champiñon🍄‍🟫\n[3] Otro➕.")
         ingrediente=input("¿Opcion? = ")
-
+            #solicitud de ingredientes adicionales ***************************************2
         if  ingrediente=="1":
             print("\nUsted ordeno una pizza vegetariena con mozarella🧀, tomate🍅 y pimiento🫑\n")
 
@@ -31,10 +31,10 @@ while opciones != "3":
         else:
             print("\n!❌ERROR¡ ingrediente no encontrado\n")
 
-    elif opciones =="2":
+    elif opciones =="2": # opcion 2 no vegetariana 
         print("Ingrese numero del ingrediente adiccional.\n[1] Peperoni🥓\n[2] Jamon🥩\n[3] Salmon🍣\n[4] Otro➕.")
         ingrediente = input("¿opcion? = ")
-
+            #solicitud de ingredientes adicionales ****************************************
         if ingrediente=="1":
             print("\nUsted ordeno una pizza no vegetariena y es con mozarella🧀, tomate🍅 y peperoni🥓\n")
         
@@ -51,7 +51,7 @@ while opciones != "3":
         else:
             print("\n!❌ERROR¡ ingrediente no encontrado\n")
 
-    elif opciones == "3": 
+    elif opciones == "3": # salir del programa
         print("¡Nos alegra que nos visitaran!🤗\n")
         print("GRACIAS POR SU VISITA VUELVA PRONTO😋")
 
