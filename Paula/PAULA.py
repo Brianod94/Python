@@ -12,12 +12,12 @@ while opc != 5: # mientras tiene el comparador de diferencia para que al moement
   print("********************************************\n")
   # esta seria el comienzo del condicional para el momento de elegir cualquiera opcion 
   # cada 1 de la opciones debemos trabajarlas internamente para que empiecen a funcionar 
-  opc = int(input ('digite opcion: '))
+  opc = int(input ("Digite opcion: "))
   if opc == 1:   
       # Lista principal de clientes
     clientes = []
 
-    # Ciclo principal
+    # Ciclo principal dentro del menu clientes 
     while True:
         print(" \n=== Menú de Clientes ===")
         print("[1] Crear cliente")
@@ -25,60 +25,72 @@ while opc != 5: # mientras tiene el comparador de diferencia para que al moement
         print("[3] Modificar cliente")
         print("[4] Borrar cliente")
         print("[5] Salir")
+        print("********************************************\n")
         
         opcion = input("Seleccione una opción: ")
 
-        if opcion == "1":  # Crear cliente
-            print("\n--- Crear Cliente ---")
+        if opcion == "1":                            # Crear cliente*******************
+            print("\n==== Crear Cliente ====")
+                        
             id_cliente = input("ID del cliente: ")
-            nombre     = input("Nombre: ")
-            correo     = input("Correo: ")
-            telefono   = input("Teléfono: ")
-            cliente    = [id_cliente, nombre, correo, telefono]
-            clientes.append(cliente)
-            print("Cliente creado exitosamente.\n")
+              # Verificamos si el ID ya existe en nuestra lista 
+            for cliente in clientes:
+                  if cliente[0] == id_cliente:
+                      print("Error: El ID ingresado ya existe.\n")
+                      
+                      break
+            else:
+                  # Si no encontró un ID duplicado, se sale del cicllo while
+                  
+              nombre_empresa       = input("Nombre de la Empresa: ").title()
+              nombre_representante = input("Representante legal: ").title()
+              correo               = input("Correo: ").title()
+              telefono             = input("Teléfono: ")
+              cliente      = [id_cliente, nombre_empresa, nombre_representante, correo, telefono]
+              clientes.append(cliente)
+              print("Cliente creado exitosamente.\n")
+              
 
-        elif opcion == "2":  # Consultar clientes
-            print("\n--- Lista de Clientes ---")
+        elif opcion == "2":                         # Consultar clientes***************
+            print("\n==== Lista de Clientes ====")
             if len(clientes) == 0:
                 print("No hay clientes registrados.\n")
             else:
                 for cliente in clientes:
-                    print(f"ID: {cliente[0]}\ntNombre: {cliente[1]}\nCorreo: {cliente[2]}\nTeléfono: {cliente[3]}")
+                    print(f"ID Cliente: {cliente[0]}\nNombre de la Empresa: {cliente[1]}\nRespresentante legar: {cliente[2]}\nCorreo: {cliente[3]}\nTeléfono: {cliente[4]}",end="\t")
+                    print()
                 print()
 
-        elif opcion == "3":  # Modificar cliente
-            print("\n--- Modificar Cliente ---")
+        elif opcion == "3":                          # Modificar cliente***************
+            print("\n==== Modificar Cliente ====")
             id_buscar = input("Ingrese el ID del cliente a modificar: ")
-            encontrado = False
+
             for cliente in clientes:
                 if cliente[0] == id_buscar:
                     print(f"Cliente encontrado: {cliente}")
                     cliente[1] = input("Nuevo nombre: ")
                     cliente[2] = input("Nuevo correo: ")
                     cliente[3] = input("Nuevo teléfono: ")
-                    print("Cliente modificado exitosamente.\n") 
-                    encontrado = True
+                    print("Cliente modificado exitosamente.\n")
                     break
-            if not encontrado:
+            else:
                 print("Cliente no encontrado.\n")
 
-        elif opcion == "4":  # Borrar cliente
-            print("\n--- Borrar Cliente ---")
+
+        elif opcion == "4":                             # Borrar cliente*******************
+            print("\n==== Borrar Cliente ====")
             id_buscar = input("Ingrese el ID del cliente a borrar: ")
-            encontrado = False
+            
             for i in range(len(clientes)):
                 if clientes[i][0] == id_buscar:
                     print(f"Cliente encontrado: {clientes[i]}")
                     clientes.pop(i)
                     print("Cliente borrado exitosamente.\n")
-                    encontrado = True
                     break
-            if not encontrado:
+            else:
                 print("Cliente no encontrado.\n")
 
-        elif opcion == "5":  # Salir
-            print("Saliendo del programa...")
+        elif opcion == "5":                             # Salir*****************************
             break
 
         else:
