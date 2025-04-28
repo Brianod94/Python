@@ -2,7 +2,7 @@
 #25 automóviles que lleguen. Asimismo se desea saber los puntos contaminantes del carro que menos contaminó y
 #del que más contaminó. 
 maximo = 0
-minimo = 1000
+minimo = float ("inf")
 
 for i in range (1,6):
     cantidad_p_cont = int (input(f"digite cantidad de puntos contaminantes del vehiculo {i}. ")) #cantidad de puntos contaminantes
