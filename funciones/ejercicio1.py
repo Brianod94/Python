@@ -7,17 +7,17 @@ def registrar_venta():
         print("\n--- Registro de Venta ---")
         tienda = int(input("Ingrese el código de la tienda (1, 2 o 3): "))
         if tienda not in ventas_por_tienda:
-            print("❌ Código de tienda inválido. Debe ser 1, 2 o 3.\n")
+            print("!ERROR¡ Código de tienda inválido. Debe ser 1, 2 o 3.\n")
             return
         
         deporte = input("Ingrese el nombre del deporte: ").strip()
         if not deporte:
-            print("❌ El nombre del deporte no puede estar vacío.\n")
+            print("!ERROR¡ El nombre del deporte no puede estar vacío.\n")
             return
         
         valor = float(input("Ingrese el valor de la venta: "))
         if valor <= 0:
-            print("❌ El valor de la venta debe ser mayor que 0.\n")
+            print("!ERROR¡ El valor de la venta debe ser mayor que 0.\n")
             return
 
         # Confirmación
@@ -37,7 +37,7 @@ def registrar_venta():
         print("✅ Venta registrada exitosamente.\n")
     
     except ValueError:
-        print("❌ Entrada inválida. Asegúrese de ingresar números donde corresponde.\n")
+        print("!ERROR¡ Entrada inválida. Asegúrese de ingresar números donde corresponde.\n")
 
 def mostrar_venta_total_por_tienda():
     print("\nVentas totales por tienda:")
