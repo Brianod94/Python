@@ -53,12 +53,13 @@ def mostrar_venta_total_por_deporte():
 
 def menu():
     while True:
+        print("*************************************")
         print("Menú:")
-        print("1. Registrar Venta")
-        print("2. Mostrar venta total por tienda")
-        print("3. Mostrar venta total por deporte")
-        print("4. Salir")
-        
+        print("[1] Registrar Venta")
+        print("[2] Mostrar venta total por tienda")
+        print("[3] Mostrar venta total por deporte")
+        print("[4] Salir")
+        print("*************************************")
         opcion = input("Seleccione una opción: ")
         
         if opcion == "1":
