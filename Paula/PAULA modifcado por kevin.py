@@ -1,132 +1,224 @@
-def autenticar(usuario, clave, usuarios):
-    """
-    Verifica las credenciales del usuario y retorna su rol si son válidas.
-    """
-    for u in usuarios:
-        if u['usuario'] == usuario and u['clave'] == clave:
-            return u['rol']
-    return None
+# === VARIABLES GLOBALES ===
+clientes = []
+materia_prima = []
+inventario = []
+pedidos = []
 
-
-def tiene_permiso(rol, operacion):
-    """
-    Determina si un rol tiene permiso para ejecutar la operación solicitada.
-    """
-    if rol == 'ADMINISTRADOR':
-        return True
-    if rol == 'VENDEDOR':
-        return operacion in ('CREAR', 'CONSULTAR')
-    return False
-
-
-def encontrar_cliente(lista, id_buscar):
-    """
-    Busca un cliente por su ID en la lista y lo retorna, o None si no existe.
-    """
-    return next((c for c in lista if c['id'] == id_buscar), None)
-
-
-def main():
-    usuarios = [
-        {'usuario': 'admin', 'clave': '1234', 'rol': 'ADMINISTRADOR'},
-        {'usuario': 'vendedor', 'clave': 'abcd', 'rol': 'VENDEDOR'}
-    ]
-    lista_clientes = []
-
-    # Autenticación
-    rol_actual = None
-    while rol_actual is None:
-        usuario = input("Usuario: ").strip()
-        clave = input("Clave: ").strip()
-        rol_actual = autenticar(usuario, clave, usuarios)
-        if rol_actual is None:
-            print("Usuario o clave incorrectos. Intente de nuevo.\n")
-
-    print(f"\n¡Bienvenido! Rol asignado: {rol_actual}\n")
-
-    # Menú principal
-    opciones = {
-        '1': 'CREAR',
-        '2': 'CONSULTAR',
-        '3': 'MODIFICAR',
-        '4': 'ELIMINAR',
-        '5': 'SALIR'
-    }
-
+# === FUNCIONES DE UTILIDADES ===
+def input_numero(mensaje):
     while True:
-        print("Menú de opciones:")
-        print("1. Crear cliente")
-        print("2. Consultar cliente")
-        print("3. Modificar cliente")
-        print("4. Eliminar cliente")
-        print("5. Salir")
-        opcion = input("Seleccione una opción (1-5): ").strip()
+        try:
+            return int(input(mensaje))
+        except ValueError:
+            print("\u26a0\ufe0f Error: Ingrese un n\u00famero v\u00e1lido.")
 
-        operacion = opciones.get(opcion, 'DESCONOCIDA')
+def input_telefono(mensaje):
+    while True:
+        telefono = input(mensaje)
+        if telefono.isdigit():
+            return telefono
+        else:
+            print("\u26a0\ufe0f Error: El tel\u00e9fono debe contener solo n\u00fameros.")
 
-        # Verificar permisos
-        if operacion != 'SALIR' and not tiene_permiso(rol_actual, operacion):
-            print("No tiene permisos para realizar esta operación.\n")
-            continue
+# === FUNCIONES DE CLIENTES ===
+def registrar_cliente():
+    print("\n=== Registrar Cliente ===")
+    id_cliente = input("ID del cliente: ")
+    for cliente in clientes:
+        if cliente['id'] == id_cliente:
+            print("\u26a0\ufe0f Error: ID ya existe.")
+            return
+    nombre_empresa = input("Nombre de la Empresa: ").title()
+    representante = input("Representante Legal: ").title()
+    correo = input("Correo: ")
+    telefono = input_telefono("Tel\u00e9fono: ")
+    clientes.append({
+        'id': id_cliente,
+        'empresa': nombre_empresa,
+        'representante': representante,
+        'correo': correo,
+        'telefono': telefono
+    })
+    print("\u2705 Cliente registrado exitosamente.")
 
-        # Ejecutar operación
-        if opcion == '1':  # CREAR
-            id_cliente = input("ID cliente: ").strip()
-            nombre = input("Nombre: ").strip()
-            correo = input("Correo: ").strip()
-            telefono = input("Teléfono: ").strip()
-            cliente = {
-                'id': id_cliente,
-                'nombre': nombre,
-                'correo': correo,
-                'telefono': telefono
-            }
-            lista_clientes.append(cliente)
-            print("Cliente creado exitosamente.\n")
+def listar_clientes():
+    print("\n=== Lista de Clientes ===")
+    if not clientes:
+        print("No hay clientes registrados.")
+    for c in clientes:
+        print(f"ID: {c['id']} | Empresa: {c['empresa']} | Representante: {c['representante']} | Correo: {c['correo']} | Tel\u00e9fono: {c['telefono']}")
 
-        elif opcion == '2':  # CONSULTAR
-            id_buscar = input("ID del cliente a consultar: ").strip()
-            cliente = encontrar_cliente(lista_clientes, id_buscar)
-            if cliente:
-                print("Datos del cliente:")
-                for k, v in cliente.items():
-                    print(f"  {k}: {v}")
-                print()
+# === FUNCIONES DE MATERIA PRIMA ===
+def registrar_materia_prima():
+    print("\n=== Registrar Materia Prima ===")
+    id_producto = input("ID del producto: ")
+    for producto in materia_prima:
+        if producto['id'] == id_producto:
+            print("\u26a0\ufe0f Error: ID de producto ya existe.")
+            return
+    nombre = input("Nombre del Producto: ").title()
+    unidad = input("Unidad de Medida (m, kg, unidades): ")
+    materia_prima.append({
+        'id': id_producto,
+        'nombre': nombre,
+        'unidad': unidad
+    })
+    inventario.append({
+        'id': id_producto,
+        'nombre': nombre,
+        'cantidad': 0
+    })
+    print("\u2705 Producto registrado exitosamente.")
+
+def listar_materia_prima():
+    print("\n=== Lista de Materia Prima ===")
+    if not materia_prima:
+        print("No hay materia prima registrada.")
+    for p in materia_prima:
+        print(f"ID: {p['id']} | Nombre: {p['nombre']} | Unidad: {p['unidad']}")
+
+# === FUNCIONES DE INVENTARIO ===
+def gestionar_inventario():
+    print("\n=== Gestionar Inventario ===")
+    id_buscar = input("Ingrese ID del producto: ")
+    for item in inventario:
+        if item['id'] == id_buscar:
+            print(f"Producto: {item['nombre']} | Cantidad actual: {item['cantidad']}")
+            cantidad = input_numero("Cantidad a agregar (usar negativo para restar): ")
+            item['cantidad'] += cantidad
+            print("\u2705 Inventario actualizado.")
+            return
+    print("\u26a0\ufe0f Producto no encontrado en inventario.")
+
+def mostrar_inventario():
+    print("\n=== Inventario Actual ===")
+    if not inventario:
+        print("No hay productos en inventario.")
+    for item in inventario:
+        print(f"ID: {item['id']} | Producto: {item['nombre']} | Cantidad: {item['cantidad']}")
+
+# === FUNCIONES DE PEDIDOS ===
+def registrar_pedido():
+    print("\n=== Registrar Pedido ===")
+    cliente_id = input("ID del cliente: ")
+    for cliente in clientes:
+        if cliente['id'] == cliente_id:
+            break
+    else:
+        print("\u26a0\ufe0f Cliente no encontrado.")
+        return
+
+    pedido = {'cliente_id': cliente_id, 'productos': []}
+    while True:
+        mostrar_inventario()
+        id_producto = input("ID del producto a pedir (o 'fin' para terminar): ")
+        if id_producto.lower() == 'fin':
+            break
+        for item in inventario:
+            if item['id'] == id_producto:
+                cantidad = input_numero("Cantidad solicitada: ")
+                if cantidad <= item['cantidad']:
+                    item['cantidad'] -= cantidad
+                    pedido['productos'].append({'id': id_producto, 'nombre': item['nombre'], 'cantidad': cantidad})
+                    print("Producto agregado al pedido.")
+                else:
+                    print("\u26a0\ufe0f No hay suficiente stock.")
+                break
+        else:
+            print("\u26a0\ufe0f Producto no encontrado.")
+    pedidos.append(pedido)
+    print("\u2705 Pedido registrado exitosamente.")
+
+def listar_pedidos():
+    print("\n=== Pedidos Registrados ===")
+    if not pedidos:
+        print("No hay pedidos registrados.")
+    for p in pedidos:
+        print(f"Cliente ID: {p['cliente_id']}")
+        for prod in p['productos']:
+            print(f"- {prod['nombre']} | Cantidad: {prod['cantidad']}")
+
+# === LOGIN Y MENUS ===
+def login():
+    usuarios = {
+        "administrador": "admin123",
+        "vendedor": "vend123"
+    }
+    print("\n======= Ingreso al Sistema =======")
+    print("[0] Salir del sistema")
+    user = input("Ingrese usuario (o 0 para salir): ").lower()
+
+    if user == "0":
+        return "salir"
+
+    password = input("Ingrese contrase\u00f1a: ")
+
+    if user in usuarios and usuarios[user] == password: #verifica si user esta dentro del diccionario usuarios
+        print(f"\nBienvenido {user.capitalize()}!\n")
+        return user
+    else:
+        print("\nUsuario o contrase\u00f1a incorrectos.\n")
+        return None
+
+def menu_principal(rol):
+    while True:
+        print("\n===== Men\u00fa Principal =====")
+        if rol == "administrador":
+            print("[1] Registro de Clientes")
+            print("[2] Registro de Materia Prima")
+            print("[3] Gesti\u00f3n de Inventario")
+            print("[4] Valores Definitivos (Pedidos)")
+            print("[5] Cerrar Sesi\u00f3n")
+        elif rol == "vendedor":
+            print("[1] Consultar Inventario")
+            print("[2] Registrar Pedido")
+            print("[3] Registrar Cliente")
+            print("[4] Cerrar Sesi\u00f3n")
+
+        opcion = input_numero("Seleccione una opci\u00f3n: ")
+
+        if rol == "administrador":
+            if opcion == 1:
+                registrar_cliente()
+                listar_clientes()
+            elif opcion == 2:
+                registrar_materia_prima()
+                listar_materia_prima()
+            elif opcion == 3:
+                gestionar_inventario()
+            elif opcion == 4:
+                listar_pedidos()
+            elif opcion == 5:
+                print("Cerrando sesi\u00f3n...")
+                break
             else:
-                print("Cliente no encontrado.\n")
+                print("Opci\u00f3n inv\u00e1lida.")
 
-        elif opcion == '3':  # MODIFICAR
-            id_buscar = input("ID del cliente a modificar: ").strip()
-            cliente = encontrar_cliente(lista_clientes, id_buscar)
-            if cliente:
-                print("Ingrese nuevos datos (enter para conservar actual):")
-                nuevo_nombre = input(f"Nombre ({cliente['nombre']}): ").strip() or cliente['nombre']
-                nuevo_correo = input(f"Correo ({cliente['correo']}): ").strip() or cliente['correo']
-                nuevo_telefono = input(f"Teléfono ({cliente['telefono']}): ").strip() or cliente['telefono']
-                cliente.update({
-                    'nombre': nuevo_nombre,
-                    'correo': nuevo_correo,
-                    'telefono': nuevo_telefono
-                })
-                print("Cliente modificado exitosamente.\n")
+        elif rol == "vendedor":
+            if opcion == 1:
+                mostrar_inventario()
+            elif opcion == 2:
+                registrar_pedido()
+            elif opcion == 3:
+                registrar_cliente()
+            elif opcion == 4:
+                print("Cerrando sesi\u00f3n...")
+                break
             else:
-                print("Cliente no encontrado.\n")
+                print("Opci\u00f3n inv\u00e1lida.")
 
-        elif opcion == '4':  # ELIMINAR
-            id_buscar = input("ID del cliente a eliminar: ").strip()
-            cliente = encontrar_cliente(lista_clientes, id_buscar)
-            if cliente:
-                lista_clientes.remove(cliente)
-                print("Cliente eliminado exitosamente.\n")
-            else:
-                print("Cliente no encontrado.\n")
+# === MAIN ===
+def main():
+    while True:
+        rol = login()
 
-        elif opcion == '5':  # SALIR
-            print("Saliendo del programa...")
+        if rol == "salir":
+            print("\nGracias por usar el sistema. \u2728 Hasta luego!")
             break
 
-        else:
-            print("Opción inválida, por favor seleccione un número del 1 al 5.\n")
+        if rol:
+            menu_principal(rol)
 
-if __name__ == '__main__':
+# Ejecutamos el programa
+if __name__ == "__main__":
     main()

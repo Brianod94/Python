@@ -1,29 +1,51 @@
-user_admin = "administrador"
-password = "1q2w3e4r5t6y"
-user1 = input("ingrese asuario.\n")
-password1 = input("ingrese contraseña.\n")
-if user_admin == user1 and password == password1:
-  print("bienvenido al roll de administrador")              
-  opc = 1 # inicializo la variable en 1 para empezar a recorrer las opciones 
-  while opc != 5: # mientras tiene el comparador de diferencia para que al moemento de ingresar una opcion mala salga un enunciado de error
+clientes = [] 
+def autenticar(usuarios, max_intentos=3):
+    intentos = 0
+    
+    while intentos < max_intentos:
+        user = input("Usuario: ")
+        password = input("Contraseña: ")
+        
+        if user in usuarios and usuarios[user] == password:
+            print(f"\n¡Bienvenido {user.capitalize()}!\n")
+            return user
+        else:
+            print("\nUsuario o contraseña incorrectos.\n")
+            intentos += 1
+    
+    print("Demasiados intentos fallidos. Acceso denegado.\n")
+    return None
 
-    print("********************************************\n")
-    #inicio del menu de seleccion con la opciones disponibles 
-    print ('[1] Registro de Clientes')  #
-    print ('[2] Materia Prima')
-    print ('[3] Inventario')
-    print ('[4] Valores Definitivos')
-    print ('[5] salir')
-    print("********************************************\n")
-    # esta seria el comienzo del condicional para el momento de elegir cualquiera opcion 
-    # cada 1 de la opciones debemos trabajarlas internamente para que empiecen a funcionar 
-    opc = int(input ("Digite opcion: "))
-    if opc == 1:   
-        # Lista principal de clientes
-      clientes = []
+# Ejemplo de uso:
+usuarios = {
+    "Administrador": "admin1234",
+    "Vendedor": "local1234",
+}
 
-      # Ciclo principal dentro del menu clientes 
-      while True:
+usuario_autenticado = autenticar(usuarios)
+
+if usuario_autenticado:
+    print(f"Acceso concedido a {usuario_autenticado}")
+else:
+    print("No se pudo autenticar al usuario.")
+
+   
+def menu_principal():  
+    opc = 1 # inicializo la variable en 1 para empezar a recorrer las opciones 
+    while opc != 5: # mientras tiene el comparador de diferencia para que al moemento de ingresar una opcion mala salga un enunciado de error
+    
+        print("********************************************\n")
+        #inicio del menu de seleccion con la opciones disponibles 
+        print ('[1] Registro de Clientes')  #
+        print ('[2] Registro de Materia Prima')
+        print ('[3] Inventario')
+        print ('[4] Valores Definitivos')
+        print ('[5] salir')
+        print("********************************************\n")
+        break
+    
+def registrar_cliente():
+   while True:
           print(" \n=== Menú de Clientes ===")
           print("[1] Crear cliente")
           print("[2] Consultar clientes")
@@ -95,19 +117,26 @@ if user_admin == user1 and password == password1:
             else:
                 print("Cliente no encontrado.\n")
 
-          elif opcion == "5":                             # Salir*****************************
+          elif opcion == "5":  
+            print("saliendo....")                           # Salir*****************************
             break
 
           else:
-            print("Opción inválida. Intente nuevamente.\n")
+            print("Opción inválida. Intente nuevamente.\n") 
 
-    # elif opc == 2:
-    # print('aqui llamo a la función Materia prima()')
-    # elif opc == 3:
-    #   print('aqui llamo a la función Inventario()')
-    # elif opc == 4:
-    #   print('aqui llamo a la función Valores Defenitivos()')
-    # elif opc == 5:
-    # print ('Salir del proograma')
-    # else:
-    # print ('digite una Opcion Valida')
+   
+menu_principal()
+opc = int(input ("Digite opcion: "))
+if opc == 1: 
+  registrar_cliente()
+  print("aqui llamamos a la funcion crear cliente")
+elif opc == 2:
+  print('aqui llamo a la función Materia prima()')
+elif opc == 3:
+  print('aqui llamo a la función Inventario()')
+elif opc == 4:
+  print('aqui llamo a la función Valores Defenitivos()')
+elif opc == 5:
+  print ('Salir del proograma')
+else:
+  print ('digite una Opcion Valida')
