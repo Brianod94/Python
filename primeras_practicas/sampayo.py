@@ -1,21 +1,21 @@
-contador = 0
-notas = 0
+def llenar_lista():
+    """Llena una lista con 5 números ingresados por el usuario."""
+    lista = []
+    for i in range(5):
+        numero = float(input(f"Ingrese el número {i+1}: "))
+        lista.append(numero)
+    return lista
 
-while contador < 7:
+def encontrar_mayor(lista):
+    """Imprime la posición y el valor del elemento mayor en la lista."""
+    mayor = lista[0]
+    posicion = 0
+    for i in range(1, len(lista)):
+        if lista[i] > mayor:
+            mayor = lista[i]
+            posicion = i
+    print(f"El valor mayor es {mayor} y se encuentra en la posición {posicion}.")
 
-    nota = int(input("ingrese nota del alumno: "))
-
-    if nota < 0 or nota > 5:
-        print("!ERROR¡ esta nota no esta permitida")
-        continue  # con esto se salta la iteracion y no cuenta lo que esta abajo
-    else:
-        notas += nota
-        contador += 1
-        promedio = notas / 7
-
-if promedio < 3:
-    print(f"{round (promedio,2)} 'reprobado'")
-else:
-    print(f"{round (promedio,2)} 'aprobado'")
-
-print(f"el promedio de las notas es {round(promedio,2)}")
+# Ejemplo de uso
+mi_lista = llenar_lista()
+encontrar_mayor(mi_lista)
