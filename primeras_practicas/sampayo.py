@@ -19,3 +19,21 @@ def encontrar_mayor(lista):
 # Ejemplo de uso
 mi_lista = llenar_lista()
 encontrar_mayor(mi_lista)
+
+
+def buscar_posicion(numero, lista):
+    if numero in lista:
+        posicion = lista.index(numero)
+        print(f"El número {numero} se encuentra en la posición {posicion} de la lista.")
+    else:
+        print("Error: El número no se encuentra en la lista.")
+
+# Lista de ejemplo
+mi_lista = [10, 20, 30, 40, 50]
+
+# Leer número desde el teclado
+try:
+    numero_usuario = int(input("Ingrese un número: "))
+    buscar_posicion(numero_usuario, mi_lista)
+except ValueError:
+    print("Error: Entrada no válida. Por favor, ingrese un número entero.")
