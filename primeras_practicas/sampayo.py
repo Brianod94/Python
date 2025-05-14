@@ -1,21 +1,39 @@
-contador = 0
-notas = 0
+def llenar_lista():
+    """Llena una lista con 5 números ingresados por el usuario."""
+    lista = []
+    for i in range(5):
+        numero = float(input(f"Ingrese el número {i+1}: "))
+        lista.append(numero)
+    return lista
 
-while contador < 7:
+def encontrar_mayor(lista):
+    """Imprime la posición y el valor del elemento mayor en la lista."""
+    mayor = lista[0]
+    posicion = 0
+    for i in range(1, len(lista)):
+        if lista[i] > mayor:
+            mayor = lista[i]
+            posicion = i
+    print(f"El valor mayor es {mayor} y se encuentra en la posición {posicion}.")
 
-    nota = int(input("ingrese nota del alumno: "))
+# Ejemplo de uso
+mi_lista = llenar_lista()
+encontrar_mayor(mi_lista)
 
-    if nota < 0 or nota > 5:
-        print("!ERROR¡ esta nota no esta permitida")
-        continue  # con esto se salta la iteracion y no cuenta lo que esta abajo
+
+def buscar_posicion(numero, lista):
+    if numero in lista:
+        posicion = lista.index(numero)
+        print(f"El número {numero} se encuentra en la posición {posicion} de la lista.")
     else:
-        notas += nota
-        contador += 1
-        promedio = notas / 7
+        print("Error: El número no se encuentra en la lista.")
 
-if promedio < 3:
-    print(f"{round (promedio,2)} 'reprobado'")
-else:
-    print(f"{round (promedio,2)} 'aprobado'")
+# Lista de ejemplo
+mi_lista = [10, 20, 30, 40, 50]
 
-print(f"el promedio de las notas es {round(promedio,2)}")
+# Leer número desde el teclado
+try:
+    numero_usuario = int(input("Ingrese un número: "))
+    buscar_posicion(numero_usuario, mi_lista)
+except ValueError:
+    print("Error: Entrada no válida. Por favor, ingrese un número entero.")
