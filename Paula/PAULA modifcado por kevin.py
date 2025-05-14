@@ -1,199 +1,77 @@
-# === VARIABLES GLOBALES ===
-clientes = []
-materia_prima = []
-inventario = []
+from datetime import datetime
+
+# ================== DICCIONARIOS Y VARIABLES GLOBALES ==================
+clientes = {}
+materias_primas = []
 pedidos = []
 
-# === FUNCIONES DE UTILIDADES ===
-def input_numero(mensaje):
-    while True:
-        try:
-            return int(input(mensaje))
-        except ValueError:
-            print("\u26a0\ufe0f Error: Ingrese un n\u00famero v\u00e1lido.")
+usuarios = {
+    "Administrador": "admin1234",
+    "Vendedor": "local1234",
+    "Produccion": "produ1234"
+}
 
-def input_telefono(mensaje):
-    while True:
-        telefono = input(mensaje)
-        if telefono.isdigit():
-            return telefono
+# ================== FUNCIONES DE AUTENTICACIÓN ==================
+def autenticar(usuarios, max_intentos=3):
+    intentos = 0
+    while intentos < max_intentos:
+        user = input("Ingrese Usuario\n")
+        password = input("Contraseña\n")
+
+        if user in usuarios and usuarios[user] == password:
+            print("*************************************")
+            print(f"-----¡Bienvenido {user.capitalize()}!------")
+            print("*************************************")
+            return user
         else:
-            print("\u26a0\ufe0f Error: El tel\u00e9fono debe contener solo n\u00fameros.")
+            print("\nUsuario o contraseña incorrectos.\n")
+            intentos += 1
 
-# === FUNCIONES DE CLIENTES ===
-def registrar_cliente():
-    print("\n=== Registrar Cliente ===")
-    id_cliente = input("ID del cliente: ")
-    for cliente in clientes:
-        if cliente['id'] == id_cliente:
-            print("\u26a0\ufe0f Error: ID ya existe.")
-            return
-    nombre_empresa = input("Nombre de la Empresa: ").title()
-    representante = input("Representante Legal: ").title()
-    correo = input("Correo: ")
-    telefono = input_telefono("Tel\u00e9fono: ")
-    clientes.append({
-        'id': id_cliente,
-        'empresa': nombre_empresa,
-        'representante': representante,
-        'correo': correo,
-        'telefono': telefono
-    })
-    print("\u2705 Cliente registrado exitosamente.")
+    print("Demasiados intentos fallidos. Acceso denegado.\n")
+    return None
 
-def listar_clientes():
-    print("\n=== Lista de Clientes ===")
-    if not clientes:
-        print("No hay clientes registrados.")
-    for c in clientes:
-        print(f"ID: {c['id']} | Empresa: {c['empresa']} | Representante: {c['representante']} | Correo: {c['correo']} | Tel\u00e9fono: {c['telefono']}")
-
-# === FUNCIONES DE MATERIA PRIMA ===
-def registrar_materia_prima():
-    print("\n=== Registrar Materia Prima ===")
-    id_producto = input("ID del producto: ")
-    for producto in materia_prima:
-        if producto['id'] == id_producto:
-            print("\u26a0\ufe0f Error: ID de producto ya existe.")
-            return
-    nombre = input("Nombre del Producto: ").title()
-    unidad = input("Unidad de Medida (m, kg, unidades): ")
-    materia_prima.append({
-        'id': id_producto,
-        'nombre': nombre,
-        'unidad': unidad
-    })
-    inventario.append({
-        'id': id_producto,
-        'nombre': nombre,
-        'cantidad': 0
-    })
-    print("\u2705 Producto registrado exitosamente.")
-
-def listar_materia_prima():
-    print("\n=== Lista de Materia Prima ===")
-    if not materia_prima:
-        print("No hay materia prima registrada.")
-    for p in materia_prima:
-        print(f"ID: {p['id']} | Nombre: {p['nombre']} | Unidad: {p['unidad']}")
-
-# === FUNCIONES DE INVENTARIO ===
-def gestionar_inventario():
-    print("\n=== Gestionar Inventario ===")
-    id_buscar = input("Ingrese ID del producto: ")
-    for item in inventario:
-        if item['id'] == id_buscar:
-            print(f"Producto: {item['nombre']} | Cantidad actual: {item['cantidad']}")
-            cantidad = input_numero("Cantidad a agregar (usar negativo para restar): ")
-            item['cantidad'] += cantidad
-            print("\u2705 Inventario actualizado.")
-            return
-    print("\u26a0\ufe0f Producto no encontrado en inventario.")
-
-def mostrar_inventario():
-    print("\n=== Inventario Actual ===")
-    if not inventario:
-        print("No hay productos en inventario.")
-    for item in inventario:
-        print(f"ID: {item['id']} | Producto: {item['nombre']} | Cantidad: {item['cantidad']}")
-
-# === FUNCIONES DE PEDIDOS ===
-def registrar_pedido():
-    print("\n=== Registrar Pedido ===")
-    cliente_id = input("ID del cliente: ")
-    for cliente in clientes:
-        if cliente['id'] == cliente_id:
-            break
-    else:
-        print("\u26a0\ufe0f Cliente no encontrado.")
-        return
-
-    pedido = {'cliente_id': cliente_id, 'productos': []}
-    while True:
-        mostrar_inventario()
-        id_producto = input("ID del producto a pedir (o 'fin' para terminar): ")
-        if id_producto.lower() == 'fin':
-            break
-        for item in inventario:
-            if item['id'] == id_producto:
-                cantidad = input_numero("Cantidad solicitada: ")
-                if cantidad <= item['cantidad']:
-                    item['cantidad'] -= cantidad
-                    pedido['productos'].append({'id': id_producto, 'nombre': item['nombre'], 'cantidad': cantidad})
-                    print("Producto agregado al pedido.")
-                else:
-                    print("\u26a0\ufe0f No hay suficiente stock.")
-                break
-        else:
-            print("\u26a0\ufe0f Producto no encontrado.")
-    pedidos.append(pedido)
-    print("\u2705 Pedido registrado exitosamente.")
-
-def listar_pedidos():
-    print("\n=== Pedidos Registrados ===")
-    if not pedidos:
-        print("No hay pedidos registrados.")
-    for p in pedidos:
-        print(f"Cliente ID: {p['cliente_id']}")
-        for prod in p['productos']:
-            print(f"- {prod['nombre']} | Cantidad: {prod['cantidad']}")
-
-# === LOGIN Y MENUS ===
-def login():
-    usuarios = {
-        "administrador": "admin123",
-        "vendedor": "vend123"
-    }
-    print("\n======= Ingreso al Sistema =======")
-    print("[0] Salir del sistema")
-    user = input("Ingrese usuario (o 0 para salir): ").lower()
-
-    if user == "0":
-        return "salir"
-
-    password = input("Ingrese contrase\u00f1a: ")
-
-    if user in usuarios and usuarios[user] == password: #verifica si user esta dentro del diccionario usuarios
-        print(f"\nBienvenido {user.capitalize()}!\n")
-        return user
-    else:
-        print("\nUsuario o contrase\u00f1a incorrectos.\n")
-        return None
-
+# ================== FUNCIONES DEL MENÚ PRINCIPAL ==================
 def menu_principal(rol):
     while True:
-        print("\n===== Men\u00fa Principal =====")
+        print("\n===== Menú Principal =====\n")
+        rol = rol.lower()
+
         if rol == "administrador":
             print("[1] Registro de Clientes")
-            print("[2] Registro de Materia Prima")
-            print("[3] Gesti\u00f3n de Inventario")
-            print("[4] Valores Definitivos (Pedidos)")
-            print("[5] Cerrar Sesi\u00f3n")
+            print("[2] Gestión de Inventario")
+            print("[3] Valores Definitivos (Pedidos)")
+            print("[4] Cerrar Sesión")
         elif rol == "vendedor":
             print("[1] Consultar Inventario")
             print("[2] Registrar Pedido")
             print("[3] Registrar Cliente")
-            print("[4] Cerrar Sesi\u00f3n")
+            print("[4] Cerrar Sesión")
+        elif rol == "produccion":
+            print("[1] Consultar pedido")
+        else:
+            print("Rol desconocido. Cerrando sesión.")
+            break
 
-        opcion = input_numero("Seleccione una opci\u00f3n: ")
+        try:
+            opcion = int(input("Seleccione una opción: "))
+        except ValueError:
+            print("Por favor, ingrese un número válido.\n")
+            continue
 
         if rol == "administrador":
             if opcion == 1:
                 registrar_cliente()
-                listar_clientes()
             elif opcion == 2:
-                registrar_materia_prima()
-                listar_materia_prima()
+                print("========================= \n")
+                print("[1] Registrar nuevo inventario")
+                print("[2] Consultar inventario")
             elif opcion == 3:
-                gestionar_inventario()
-            elif opcion == 4:
                 listar_pedidos()
-            elif opcion == 5:
-                print("Cerrando sesi\u00f3n...")
+            elif opcion == 4:
+                print("Cerrando sesión...\n")
                 break
             else:
-                print("Opci\u00f3n inv\u00e1lida.")
-
+                print("Opción inválida.\n")
         elif rol == "vendedor":
             if opcion == 1:
                 mostrar_inventario()
@@ -202,23 +80,158 @@ def menu_principal(rol):
             elif opcion == 3:
                 registrar_cliente()
             elif opcion == 4:
-                print("Cerrando sesi\u00f3n...")
+                print("Cerrando sesión...\n")
                 break
             else:
-                print("Opci\u00f3n inv\u00e1lida.")
+                print("Opción inválida.\n")
+        elif rol == "produccion":
+            if opcion == 1:
+                consultar_pedidos()
+            else:
+                print("Opción inválida.\n")
 
-# === MAIN ===
-def main():
+# ================== FUNCIONES DEL MÓDULO CLIENTES ==================
+def registrar_cliente():
     while True:
-        rol = login()
+        print("\n=== Menú de Clientes ===")
+        print("[1] Crear cliente")
+        print("[2] Consultar clientes")
+        print("[3] Modificar cliente")
+        print("[4] Borrar cliente")
+        print("[5] Salir")
+        print("********************************************\n")
 
-        if rol == "salir":
-            print("\nGracias por usar el sistema. \u2728 Hasta luego!")
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == "1":
+            print("\n==== Crear Cliente ====")
+            id_cliente = input("ID del cliente: ")
+            if id_cliente in clientes:
+                print("Error: El ID ingresado ya existe.\n")
+            else:
+                nombre_empresa = input("Nombre de la Empresa: ").title()
+                nombre_representante = input("Representante legal: ").title()
+                correo = input("Correo: ")
+                telefono = input("Teléfono: ")
+                fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+                clientes[id_cliente] = {
+                    "empresa": nombre_empresa,
+                    "representante": nombre_representante,
+                    "correo": correo,
+                    "telefono": telefono,
+                    "ultima_modificacion": fecha
+                }
+                print(f"Cliente creado exitosamente el {fecha}.\n")
+
+        elif opcion == "2":
+            print("\n==== Consultar Clientes ====")
+            if not clientes:
+                print("No hay clientes registrados.\n")
+            else:
+                busqueda = input("Ingrese el ID o nombre de la empresa a buscar: ").title()
+                encontrados = False
+                for cliente_id, cliente in clientes.items():
+                    if busqueda in cliente["empresa"] or busqueda in cliente_id:
+                        print(f"""| ID: {cliente_id}
+| Empresa: {cliente["empresa"]}
+| Representante: {cliente["representante"]} 
+| Correo: {cliente["correo"]}
+| Teléfono: {cliente["telefono"]} 
+| Fecha Registro: {cliente["ultima_modificacion"]}\n""")
+                        encontrados = True
+                if not encontrados:
+                    print("No se encontraron clientes con esa búsqueda.\n")
+
+        elif opcion == "3":
+            print("\n==== Modificar Cliente ====")
+            id_buscar = input("Ingrese el ID del cliente a modificar: ")
+            cliente = clientes.get(id_buscar)
+
+            if cliente:
+                print(f"\nCliente encontrado: {cliente}")
+                print("Deje en blanco para mantener el valor actual.\n")
+
+                nuevo_nombre = input(f"Nuevo nombre de empresa [{cliente['empresa']}]: ").title()
+                nuevo_representante = input(f"Nuevo representante legal [{cliente['representante']}]: ").title()
+                nuevo_correo = input(f"Nuevo correo [{cliente['correo']}]: ")
+                nuevo_telefono = input(f"Nuevo teléfono [{cliente['telefono']}]: ")
+
+                cliente['empresa'] = nuevo_nombre or cliente['empresa']
+                cliente['representante'] = nuevo_representante or cliente['representante']
+                cliente['correo'] = nuevo_correo or cliente['correo']
+                cliente['telefono'] = nuevo_telefono or cliente['telefono']
+                cliente['ultima_modificacion'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+                print("\n✅ Cliente modificado exitosamente.\n")
+            else:
+                print("❌ Cliente no encontrado.\n")
+
+        elif opcion == "4":
+            print("\n==== Borrar Cliente ====")
+            id_buscar = input("Ingrese el ID del cliente a borrar: ")
+            if id_buscar in clientes:
+                print(f"Cliente encontrado: {clientes[id_buscar]}")
+                del clientes[id_buscar]
+                print("Cliente borrado exitosamente.\n")
+            else:
+                print("Cliente no encontrado.\n")
+
+        elif opcion == "5":
+            print("Saliendo del módulo de clientes...\n")
+            break
+        else:
+            print("Opción inválida.\n")
+
+def gestionar_inventario():
+    print("\n=== Gestión de Inventario ===")
+    descripcion = input("Descripción del movimiento: ")
+    fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    materias_primas.append([descripcion, fecha])
+    print(f"Movimiento registrado el {fecha}.\n")
+
+def listar_pedidos():
+    print("\n=== Listado de Pedidos ===")
+    if not pedidos:
+        print("No hay pedidos registrados.\n")
+    else:
+        for pedido in pedidos:
+            print(f"Cliente: {pedido[0]} | Producto: {pedido[1]} | Fecha: {pedido[2]}")
+        print()
+
+def registrar_pedido():
+    print("\n=== Registro de Pedido ===")
+    cliente = input("Nombre del cliente: ").title()
+    producto = input("Producto solicitado: ").title()
+    fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    pedidos.append([cliente, producto, fecha])
+    print(f"Pedido registrado el {fecha}.\n")
+
+def consultar_pedidos():
+    print("\n=== Consulta de Pedidos ===")
+    if not pedidos:
+        print("No hay pedidos para consultar.\n")
+    else:
+        for pedido in pedidos:
+            print(f"Cliente: {pedido[0]} | Producto: {pedido[1]} | Fecha: {pedido[2]}")
+
+def mostrar_inventario():
+    print("\n=== Consulta de Inventario ===")
+    if not materias_primas:
+        print("No hay materias primas registradas.\n")
+    else:
+        for mp in materias_primas:
+            print(f"Materia Prima: {mp[0]} | Fecha Registro: {mp[1]}")
+
+# ================== FLUJO PRINCIPAL ==================
+def programa():
+    while True:
+        usuario_autenticado = autenticar(usuarios)
+        if usuario_autenticado:
+            menu_principal(usuario_autenticado)
+        else:
+            print("Acceso denegado o máximo de intentos fallidos.")
             break
 
-        if rol:
-            menu_principal(rol)
-
-# Ejecutamos el programa
-if __name__ == "__main__":
-    main()
+# ================== EJECUTAR PROGRAMA ==================
+programa()
