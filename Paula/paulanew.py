@@ -183,7 +183,7 @@ Fecha Registro: {cliente['fecha']}""")
             if cliente:
                 print("Deje en blanco para mantener el valor actual.")
 
-                # Validación para la empresa
+                # ======================Validación para la empresa======================
                 nuevo_empresa = input(f"Nuevo nombre de empresa [{cliente['empresa']}]: ").title()
                 if nuevo_empresa:
                     if validar_nombre(nuevo_empresa):
@@ -191,7 +191,7 @@ Fecha Registro: {cliente['fecha']}""")
                     else:
                         print("❌ Nombre de la empresa inválido. Se mantiene el valor anterior.")
 
-                # Validación para el representante
+                # ======================Validación para el representante======================
                 nuevo_representante = input(f"Nuevo representante legal [{cliente['representante']}]: ").title()
                 if nuevo_representante:
                     if validar_nombre(nuevo_representante):
@@ -199,7 +199,7 @@ Fecha Registro: {cliente['fecha']}""")
                     else:
                         print("❌ Nombre del representante inválido. Se mantiene el valor anterior.")
 
-                # Validación de correo
+                # ======================Validación de correo======================
                 nuevo_correo = input(f"Nuevo correo [{cliente['correo']}]: ").lower()
                 if nuevo_correo:
                     if validar_correo(nuevo_correo):
@@ -207,7 +207,7 @@ Fecha Registro: {cliente['fecha']}""")
                     else:
                         print("❌ Correo inválido. Se mantuvo el anterior.")
 
-                # Validación de teléfono
+                # ======================Validación de teléfono======================
                 nuevo_telefono = input(f"Nuevo teléfono [{cliente['telefono']}]: ")
                 if nuevo_telefono:
                     if validar_telefono(nuevo_telefono):
