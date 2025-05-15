@@ -1,5 +1,11 @@
-import re
+
 from datetime import datetime
+import re
+import os
+
+# ================== LIMPIAR PANTALLA ==================
+def limpiar_pantalla():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 # ================== LISTAS Y VARIABLES GLOBALES ==================
 clientes = []
@@ -11,28 +17,13 @@ usuarios = {
     "Produccion": "produ1234"
 }
 
-# ================== FUNCIONES DE VALIDACIÓN ==================
-def validar_correo(correo):
-    # Patrón para validar correos comunes (usuario@dominio.ext)
-    patron = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-    return re.match(patron, correo) is not None
-
-def validar_telefono(telefono):
-    # Valida que solo contenga dígitos y que la longitud esté entre 7 y 15
-    return telefono.isdigit() and 7 <= len(telefono) <= 15
-
-def validar_nombre(nombre):
-    # Permite solo letras (mayúsculas y minúsculas) y espacios.
-    # No se permiten dígitos ni símbolos adicionales.
-    patron = r'^[A-Za-z\s]+$'
-    return re.match(patron, nombre) is not None
-
 # ================== FUNCIONES DE AUTENTICACIÓN ==================
 def autenticar(usuarios, max_intentos=3):
     intentos = 0
     while intentos < max_intentos:
         user = input("Ingrese Usuario\n")
         password = input("Contraseña\n")
+
         if user in usuarios and usuarios[user] == password:
             print("*************************************")
             print(f"-----¡Bienvenido {user.capitalize()}!------")
@@ -41,14 +32,17 @@ def autenticar(usuarios, max_intentos=3):
         else:
             print("\nUsuario o contraseña incorrectos.\n")
             intentos += 1
+
     print("Demasiados intentos fallidos. Acceso denegado.\n")
     return None
 
 # ================== FUNCIONES DEL MENÚ PRINCIPAL ==================
 def menu_principal(rol):
     while True:
+        limpiar_pantalla()
         print("\n===== Menú Principal =====\n")
         rol = rol.lower()
+
         if rol == "administrador":
             print("[1] Registro de Clientes")
             print("[2] Gestión de Inventario")
@@ -103,6 +97,7 @@ def menu_principal(rol):
 # ================== FUNCIONES DEL MÓDULO CLIENTES ==================
 def registrar_cliente():
     while True:
+        limpiar_pantalla()
         print("\n=== Menú de Clientes ===")
         print("[1] Crear cliente")
         print("[2] Consultar clientes")
@@ -112,67 +107,31 @@ def registrar_cliente():
 
         opcion = input("Seleccione una opción: ")
 
-        ## ================== validaciones registro de clientes  ==================
-
         if opcion == "1":
             print("\n==== Crear Cliente ====")
             id_cliente = input("ID del cliente: ")
             if any(c['id'] == id_cliente for c in clientes):
                 print("Error: El ID ingresado ya existe.\n")
             else:
-                #====================== Validación del nombre de la empresa ========================
-                while True:
-                    empresa = input("Nombre de la Empresa: ").title()
-                    if validar_nombre(empresa):
-                        break
-                    print("❌ El nombre de la empresa solo debe contener letras y espacios.")
-
-                    #====================== Validación del representante lega l======================
-                while True:
-                    representante = input("Representante legal: ").title()
-                    if validar_nombre(representante):
-                        break
-                    print("❌ El nombre del representante solo debe contener letras y espacios.")
-
-                # ====================== Validación de correo ======================
-                while True:
-                    correo = input("Correo: ").lower()
-                    if validar_correo(correo):
-                        break
-                    print("❌ Correo inválido. Intenta nuevamente.")
-
-                # ====================== Validación de teléfono ======================
-                while True:
-                    telefono = input("Teléfono: ")
-                    if validar_telefono(telefono):
-                        break
-                    print("❌ Teléfono inválido. Solo números, de 7 a 15 dígitos.")
-
-                             
-
                 cliente = {
                     "id": id_cliente,
-                    "empresa": empresa,
-                    "representante": representante,
-                    "correo": correo,
-                    "telefono": telefono,
+                    "empresa": input("Nombre de la Empresa: ").title(),
+                    "representante": input("Representante legal: ").title(),
+                    "correo": input("Correo: ").lower(),
+                    "telefono": input("Teléfono: "),
                     "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
                 clientes.append(cliente)
-                print(f"✅ Cliente creado exitosamente el {cliente['fecha']}.\n")
+                print(f"Cliente creado exitosamente el {cliente['fecha']}.\n")
 
         elif opcion == "2":
             print("\n==== Consultar Clientes ====")
             buscar_cliente = input("Ingrese el ID o nombre de la empresa a buscar: ").strip().lower()
             encontrados = [c for c in clientes if buscar_cliente in c["id"].lower() or buscar_cliente in c["empresa"].lower()]
+
             if encontrados:
                 for cliente in encontrados:
-                    print(f"""\nID: {cliente['id']}
-Empresa: {cliente['empresa']}
-Representante: {cliente['representante']}
-Correo: {cliente['correo']}
-Teléfono: {cliente['telefono']}
-Fecha Registro: {cliente['fecha']}""")
+                    print(f"""\nID: {cliente['id']}\nEmpresa: {cliente['empresa']}\nRepresentante: {cliente['representante']}\nCorreo: {cliente['correo']}\nTeléfono: {cliente['telefono']}\nFecha Registro: {cliente['fecha']}""")
             else:
                 print("No se encontraron clientes con ese criterio.\n")
 
@@ -180,43 +139,15 @@ Fecha Registro: {cliente['fecha']}""")
             print("\n==== Modificar Cliente ====")
             id_buscar = input("Ingrese el ID del cliente a modificar: ")
             cliente = next((c for c in clientes if c["id"] == id_buscar), None)
+
             if cliente:
                 print("Deje en blanco para mantener el valor actual.")
-
-                # Validación para la empresa
-                nuevo_empresa = input(f"Nuevo nombre de empresa [{cliente['empresa']}]: ").title()
-                if nuevo_empresa:
-                    if validar_nombre(nuevo_empresa):
-                        cliente["empresa"] = nuevo_empresa
-                    else:
-                        print("❌ Nombre de la empresa inválido. Se mantiene el valor anterior.")
-
-                # Validación para el representante
-                nuevo_representante = input(f"Nuevo representante legal [{cliente['representante']}]: ").title()
-                if nuevo_representante:
-                    if validar_nombre(nuevo_representante):
-                        cliente["representante"] = nuevo_representante
-                    else:
-                        print("❌ Nombre del representante inválido. Se mantiene el valor anterior.")
-
-                # Validación de correo
-                nuevo_correo = input(f"Nuevo correo [{cliente['correo']}]: ").lower()
-                if nuevo_correo:
-                    if validar_correo(nuevo_correo):
-                        cliente["correo"] = nuevo_correo
-                    else:
-                        print("❌ Correo inválido. Se mantuvo el anterior.")
-
-                # Validación de teléfono
-                nuevo_telefono = input(f"Nuevo teléfono [{cliente['telefono']}]: ")
-                if nuevo_telefono:
-                    if validar_telefono(nuevo_telefono):
-                        cliente["telefono"] = nuevo_telefono
-                    else:
-                        print("❌ Teléfono inválido. Se mantuvo el anterior.")
-
+                cliente["empresa"] = input(f"Nuevo nombre de empresa [{cliente['empresa']}]: ") or cliente["empresa"]
+                cliente["representante"] = input(f"Nuevo representante legal [{cliente['representante']}]: ") or cliente["representante"]
+                cliente["correo"] = input(f"Nuevo correo [{cliente['correo']}]: ") or cliente["correo"]
+                cliente["telefono"] = input(f"Nuevo teléfono [{cliente['telefono']}]: ") or cliente["telefono"]
                 cliente["fecha"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print("✅ Cliente modificado exitosamente.\n")
+                print("Cliente modificado exitosamente.\n")
             else:
                 print("Cliente no encontrado.\n")
 
@@ -227,7 +158,7 @@ Fecha Registro: {cliente['fecha']}""")
                 if c["id"] == id_buscar:
                     print(f"Cliente encontrado: {c}")
                     del clientes[i]
-                    print("✅ Cliente borrado exitosamente.\n")
+                    print("Cliente borrado exitosamente.\n")
                     break
             else:
                 print("Cliente no encontrado.\n")
@@ -270,6 +201,7 @@ def consultar_pedidos():
 # ================== FLUJO PRINCIPAL ==================
 def programa():
     while True:
+        limpiar_pantalla()
         usuario_autenticado = autenticar(usuarios)
         if usuario_autenticado:
             menu_principal(usuario_autenticado)
