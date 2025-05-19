@@ -140,9 +140,10 @@ def menu_principal(rol):#=======================================================
 def crear_cliente(clientes):#=============================crear cliente===================
     print("\n==== Crear Cliente ====")
     id_cliente = input("ID del cliente: ")
-    if any(c['id'] == id_cliente for c in clientes):
-        print("❌ Error: El ID ingresado ya existe.\n")
-        return
+    for cliente in clientes:
+        if cliente['id'] == id_cliente:
+            print("❌ Error: El ID ingresado ya existe.\n")
+            return
 
     # Validar nombre de la empresa
     while True:
@@ -201,10 +202,14 @@ Fecha Registro: {cliente['fecha']}""")
 def modificar_cliente(clientes):
     print("\n==== Modificar Cliente ====")
     id_buscar = input("Ingrese el ID del cliente a modificar: ")
-    cliente = next((c for c in clientes if c["id"] == id_buscar), None)
-    if not cliente:
-        print("❌ Cliente no encontrado.\n")
-        return
+    for cliente in clientes:
+        if cliente["id"] == id_buscar:
+            break
+        else:
+            print("❌ Cliente no encontrado.\n")
+            return
+
+# Aquí puedes usar 'cliente' que es el cliente encontrado
 
     print("Deje en blanco para mantener el valor actual.")
 
@@ -245,8 +250,11 @@ def modificar_cliente(clientes):
 def eliminar_cliente(clientes):
     print("\n==== Eliminar Cliente ====")
     id_eliminar = input("Ingrese el ID del cliente a eliminar: ")
-    cliente = next((c for c in clientes if c["id"] == id_eliminar), None)
-    if not cliente:
+
+    for cliente in clientes:
+        if cliente["id"] == id_eliminar:
+            break
+    else:
         print("❌ Cliente no encontrado.\n")
         return
 
@@ -351,10 +359,18 @@ def crear_pedido():
     id_cliente = input("ID del cliente: ")
 
     # Buscar cliente por ID
-    cliente = next((c for c in clientes if c["id"] == id_cliente), None)
-    if not cliente:
-        print("❌ Cliente no registrado.")
-        return
+    cliente = None
+    for cliente in clientes:
+            if cliente["id"] == id_cliente:
+                cliente_en_lista = cliente
+                break
+    if cliente is None:
+           print("❌ Cliente no registrado.")
+           return
+
+
+# Aquí puedes usar 'cliente_en_lista' como el cliente encontrado
+
 
     # Mostrar productos disponibles (por ahora solo la lista de productos)
     if not productos:
@@ -367,10 +383,14 @@ def crear_pedido():
         print(f"{i}. Código: {prod['codigo']}, Nombre: {prod['nombre']}, Precio: ${prod['precio']:.2f}")
 
     codigo_producto = input("Código del producto: ")
-    producto = next((p for p in productos if p["codigo"] == codigo_producto), None)
-    if not producto:
-        print("❌ Producto no encontrado.")
-        return
+    for producto_individual in lista_productos:
+        if producto_individual["codigo"] == codigo_producto_buscado:
+            # Aquí haces lo que necesites con el producto encontrado
+            # por ejemplo, retornar o procesar
+            return producto_individual  # o lo que quieras hacer
+    print("❌ Producto no encontrado.")
+    return
+
 
     try:
         cantidad = int(input("Cantidad: "))
@@ -407,7 +427,8 @@ def crear_pedido():
 
 def listar_pedidos():
     for i, pedido in enumerate(pedidos, 1):
-        print(f"{i}. Cliente: {pedido['cliente']}, Producto: {pedido['producto']}, Cantidad: {pedido['cantidad']}, Total: ${pedido['total']:.2f}")
+        print(f"{i}. Cliente: {pedido['empresa']}, Producto: {pedido['tipo_prenda']}, Cantidad: {pedido['cantidad']}, Total: ${pedido['total']:.2f}")
+
 
 def consultar_pedido_por_codigo():#====================consultar pedido===============
     if not pedidos:
