@@ -129,7 +129,7 @@ def menu_principal(rol):
 
         elif rol == "produccion":
             if opcion == 1:
-                gestion_productos()
+                gestion_de_productos()
             elif opcion == 2:
                 print("Cerrando sesión...\n")
                 break
@@ -348,68 +348,165 @@ def registrar_cliente_vendedor():
         else:
             print("❌ Opción inválida. Intente de nuevo.\n")
 
-# Definimos la función para gestion de productos, que recibe la lista de productos
+def gestion_de_productos():
+    
+    
+    while True:
+        print("\n====== MENÚ DE GESTIÓN DE PRODUCTOS ======")
+        print("1. Agregar producto")
+        print("2. Consultar productos")
+        print("3. Modificar producto")
+        print("4. Eliminar producto")
+        print("5. Salir")
+        
+        opcion = input("Selecciona una opción (1-5): ").strip()
+        
+        if opcion == "1":
+            agregar_producto(productos)
+        elif opcion == "2":
+            consultar_productos(productos)
+        elif opcion == "3":
+            modificar_producto(productos)
+        elif opcion == "4":
+            eliminar_producto(productos)
+        elif opcion == "5":
+            print("¡Hasta luego!")
+            break
+        else:
+            print("Opción no válida. Por favor, ingresa un número del 1 al 5.")
+
 def agregar_producto(productos):
     print("\n==== Agregar Producto ====")
-    #========== VALIDACIÓN DEL ID ==========
+    
     id_valido = False
     while not id_valido:
         id_producto = input("ID del producto: ").strip()
-
+        
         if not id_producto:
             print("El ID no puede estar vacío.")
-        elif not id_producto.isalnum():# metodo que verifica que solo sean caractres alfanumericos
+        elif not id_producto.isalnum():
             print("El ID solo puede contener letras y números.")
-        elif id_producto in productos:
+        elif any(producto['id'] == id_producto for producto in productos):
             print("Este ID ya existe. Por favor, ingresa uno diferente.")
         else:
-            id_valido = True  # Si pasa todas las condiciones, el ID es válido
-    # ========== VALIDACIÓN DEL NOMBRE ==========
-    nombre_valido = False  # Bandera para el nombre
+            id_valido = True
+    
+    nombre_valido = False
     while not nombre_valido:
-        # Pedimos el nombre, eliminamos espacios y capitalizamos (primera letra mayúscula)
         nombre_producto = input("Nombre del producto: ").strip().title()
-        
-        # Validamos que el nombre no esté vacío
         if nombre_producto != "":
             nombre_valido = True
         else:
             print("❌ Error: El nombre no puede estar vacío")
-
-    # Pedimos la descripción (sin validación estricta)
+    
     descripcion_producto = input("Descripción: ").strip()
-
-    # ========== VALIDACIÓN DEL PRECIO ==========
+    
     precio_valido = False
     while not precio_valido:
         precio_input = input("Precio: ").strip()
-        
         try:
-            
             precio_producto = float(precio_input)
-            
-            # Verificamos que el precio no sea negativo
             if precio_producto >= 0:
                 precio_valido = True
             else:
                 print("❌ Error: El precio no puede ser negativo")
-        except ValueError:  # Si falla la conversión a float
+        except ValueError:
             print("❌ Error: Debe ingresar un número válido")
-
-    # ========== CREACIÓN DEL PRODUCTO ==========
-    # Creamos un diccionario con todos los datos del producto
+    
     nuevo_producto = {
         "id": id_producto,
         "nombre": nombre_producto,
         "descripcion": descripcion_producto,
-        "precio": precio_producto,  # Precio ya validado
-        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Fecha actual formateada
+        "precio": precio_producto,
+        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
-
-    # ========== GUARDADO Y CONFIRMACIÓN ==========
-    # Agregamos el nuevo producto a la lista principal
-    productos.append(nuevo_producto)
     
-    # Mostramos mensaje de éxito con detalles
+    productos.append(nuevo_producto)
     print(f"\n✅ Producto '{nombre_producto}' agregado exitosamente!")
-    print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")  # :.2f muestra 2 decimales
+    print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")
+
+def consultar_productos(productos):
+    print("\n==== Consulta de Productos ====")
+    
+    if not productos:
+        print("No hay productos registrados.")
+        return
+    
+    id_buscar = input("Ingrese ID para buscar (Enter para mostrar todos): ").strip()
+    
+    if id_buscar == "":
+        for producto in productos:
+            print(f"ID: {producto['id']} | Nombre: {producto['nombre']} | Precio: ${producto['precio']:.2f} | Fecha: {producto['fecha']}")
+    else:
+        producto_encontrado = False
+        for producto in productos:
+            if producto['id'] == id_buscar:
+                print(f"ID: {producto['id']}\nNombre: {producto['nombre']}\nDescripción: {producto['descripcion']}\nPrecio: ${producto['precio']:.2f}\nFecha: {producto['fecha']}")
+                producto_encontrado = True
+                break
+        
+        if not producto_encontrado:
+            print(f"No se encontró producto con ID '{id_buscar}'.")
+
+def modificar_producto(productos):
+    print("\n==== Modificar Producto ====")
+    
+    if not productos:
+        print("No hay productos para modificar.")
+        return
+    
+    id_producto_modificar = input("Ingrese el ID del producto a modificar: ").strip()
+    
+    for producto in productos:
+        if producto['id'] == id_producto_modificar:
+            print(f"Producto encontrado: {producto['nombre']} (Precio: ${producto['precio']:.2f})")
+            
+            nuevo_nombre_producto = input("Nuevo nombre (Enter para dejar igual): ").strip().title()
+            if nuevo_nombre_producto != "":
+                producto['nombre'] = nuevo_nombre_producto
+            
+            nueva_descripcion_producto = input("Nueva descripción (Enter para dejar igual): ").strip()
+            if nueva_descripcion_producto != "":
+                producto['descripcion'] = nueva_descripcion_producto
+            
+            while True:
+                nuevo_precio_producto = input("Nuevo precio (Enter para dejar igual): ").strip()
+                if nuevo_precio_producto == "":
+                    break
+                try:
+                    nuevo_precio_float = float(nuevo_precio_producto)
+                    if nuevo_precio_float >= 0:
+                        producto['precio'] = nuevo_precio_float
+                        break
+                    else:
+                        print("❌ Error: El precio no puede ser negativo")
+                except ValueError:
+                    print("❌ Error: Debe ingresar un número válido")
+            
+            print("✅ Producto modificado correctamente.")
+            return
+    
+    print(f"No se encontró producto con ID '{id_producto_modificar}'.")
+
+def eliminar_producto(productos):
+    print("\n==== Eliminar Producto ====")
+    
+    if not productos:
+        print("No hay productos para eliminar.")
+        return
+    
+    id_producto_eliminar = input("Ingrese el ID del producto a eliminar: ").strip()
+    
+    for indice, producto in enumerate(productos):
+        if producto['id'] == id_producto_eliminar:
+            confirmacion_eliminar = input(f"¿Seguro que quieres eliminar '{producto['nombre']}'? (s/n): ").strip().lower()
+            if confirmacion_eliminar == "s":
+                productos.pop(indice)
+                print("✅ Producto eliminado correctamente.")
+            else:
+                print("Operación cancelada.")
+            return
+    
+    print(f"No se encontró producto con ID '{id_producto_eliminar}'.")
+
+
