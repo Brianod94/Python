@@ -93,7 +93,6 @@ def menu_principal(rol):#=======================================================
         elif rol == "produccion":
             print("[1] Gestión de productos")
             print("[2] Cerrar Sesión")
-
         else:
             print("Rol desconocido. Cerrando sesión.")
             break
@@ -140,6 +139,11 @@ def menu_principal(rol):#=======================================================
 def crear_cliente(clientes):#=============================crear cliente===================
     print("\n==== Crear Cliente ====")
     id_cliente = input("ID del cliente: ")
+    
+    if not id_cliente.strip(): #valida que este campo no quede vacio 
+        print("❌ El ID del cliente no puede estar vacío.")
+        return
+
     for cliente in clientes:
         if cliente['id'] == id_cliente:
             print("❌ Error: El ID ingresado ya existe.\n")

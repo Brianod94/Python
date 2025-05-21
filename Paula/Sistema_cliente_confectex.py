@@ -248,3 +248,27 @@ def eliminar_cliente(clientes):
         print("✅ Cliente eliminado exitosamente.\n")
     else:
         print("❌ Operación cancelada.\n")
+
+
+
+
+
+
+if encontrados:
+        print(f"\n✅ Se encontraron {len(encontrados)} producto(s):\n")
+        for p in encontrados:
+            print("="*40)
+            print(f"ID: {p['id']}")
+            print(f"Nombre: {p['nombre']}")
+            print(f"Descripción: {p['descripcion']}")
+            print(f"Precio: ${p['precio']:.2f}")
+            print(f"Fecha Registro: {p['fecha']}")
+    else:
+        print("❌ No se encontraron productos con ese criterio.\n")
+         producto = {
+        "id": id_producto,
+        "nombre": nombre,
+        "descripcion": descripcion,
+        "precio": precio,
+        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
