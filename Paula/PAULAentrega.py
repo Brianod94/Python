@@ -347,11 +347,8 @@ def registrar_cliente_vendedor():
 
         else:
             print("❌ Opción inválida. Intente de nuevo.\n")
-#
-# Importamos el módulo datetime para obtener la fecha y hora actual
-from datetime import datetime
 
-# Definimos la función para agregar productos, que recibe la lista de productos
+# Definimos la función para gestion de productos, que recibe la lista de productos
 def agregar_producto(productos):
     print("\n==== Agregar Producto ====")
     #========== VALIDACIÓN DEL ID ==========
