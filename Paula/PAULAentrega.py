@@ -1,9 +1,9 @@
-from datatime import datatime 
+from datetime import datetime
 import re
 # diccionarios para usuarios 
-user1 = {"Brayan orozco": "admin1234"}
-user2 = {"Kevin puerta": "local1234"}
-user3 = {"Julio martinez": "produ1234"}
+user1 = {"B orozco": "admin1234"}
+user2 = {"K puerta": "local1234"}
+user3 = {"J martinez": "produ1234"}
 #listas para almacenar la informacion
 clientes = []
 inventario = []
@@ -74,8 +74,8 @@ def autenticador_usuario(usuarios_dict, rol, max_intentos=3):
     print("Demasiados intentos fallidos. Acceso denegado.\n")
     return None
 # opciones de menu duacuerdo al rol solicitado 
-def menu_principal(rol):
-    while True:
+def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado 
+    while True:             #cada roll ya tiene opciones predefinidas 
         print("\n================ MENÚ PRINCIPAL ===========================")
 
         if rol == "admin":
@@ -103,7 +103,7 @@ def menu_principal(rol):
             print("Por favor, ingrese un número válido.\n")
             continue
         # Lógica según rol
-        if rol == "admin":
+        if rol == "admin": # opciones disponibles del admin
             if opcion == 1:
                 registrar_cliente_admin()
             elif opcion == 2:
@@ -114,7 +114,8 @@ def menu_principal(rol):
             else:
                 print("Opción inválida.\n")
 
-        elif rol == "vendedor":
+        elif rol == "vendedor": #opciones disponibles del vendedor
+
             if opcion == 1:
                 consultar_productos_disponibles()
             elif opcion == 2:
@@ -125,7 +126,8 @@ def menu_principal(rol):
                 print("Cerrando sesión...\n")
                 break
             else:
-                print("Opción inválida.\n")
+                print("Opción inválida. Intente nuevamente.")
+
 
         elif rol == "produccion":
             if opcion == 1:
@@ -135,7 +137,7 @@ def menu_principal(rol):
                 break
             else:
                 print("Opción inválida.\n")
-# crear clientes con validaciones de ingreso de datos
+# ================================== gestion de clientes con todas sus validaciones ===============================================
 def crear_cliente(clientes):
     print("\n==== Crear Cliente ====")
     id_cliente = input("ID del cliente: ")
@@ -216,54 +218,96 @@ def consultar_cliente(clientes):
 # modificar clientes ya creados
 def modificar_cliente(clientes):
     print("\n==== Modificar Cliente ====")
-    id_buscar = input("Ingrese el ID del cliente a modificar: ").strip()
-
+    
+    # Validar que existan clientes registrados
+    if not clientes:
+        print("❌ No hay clientes registrados para modificar.\n")
+        return
+    
+    # Solicitar ID del cliente a modificar
+    id_modificar = input("Ingrese el ID del cliente a modificar: ").strip()
+    
+    # Buscar cliente
     cliente_encontrado = None
     for cliente in clientes:
-        if cliente["id"] == id_buscar:
+        if cliente["id"] == id_modificar:
             cliente_encontrado = cliente
             break
-
+    
     if not cliente_encontrado:
         print("❌ Cliente no encontrado.\n")
         return
-
-    print(f"\n✏️ Modificando datos del cliente '{cliente_encontrado['empresa']}'")
-
-    # Modificar nombre de empresa
-    nueva_empresa = input(f"Empresa [{cliente_encontrado['empresa']}]: ").title()
-    if nueva_empresa:
-        if validar_nombre(nueva_empresa):
-            cliente_encontrado['empresa'] = nueva_empresa
+    
+    # Mostrar información actual del cliente
+    print("\n📝 Cliente encontrado - Datos actuales:")
+    print(f"1. ID: {cliente_encontrado['id']}")
+    print(f"2. Empresa: {cliente_encontrado['empresa']}")
+    print(f"3. Representante: {cliente_encontrado['representante']}")
+    print(f"4. Correo: {cliente_encontrado['correo']}")
+    print(f"5. Teléfono: {cliente_encontrado['telefono']}")
+    print(f"Fecha Registro: {cliente_encontrado['fecha']}")
+    
+    # Menú de campos modificables
+    while True: # FACILITA LA MODIFICACION DEL CLIENTE YA QUE PODEMOS ELEGIR CAMPO SOLICITADO
+        print("\nSeleccione el campo a modificar:")
+        print("[1] Nombre de la Empresa")
+        print("[2] Representante Legal")
+        print("[3] Correo Electrónico")
+        print("[4] Teléfono")
+        print("[5] Guardar cambios y salir")
+        print("[6] Salir sin guardar")
+        
+        opcion = input("Opción: ").strip()
+        
+        if opcion == "1":  # Modificar empresa
+            while True:
+                nueva_empresa = input("Nuevo nombre de la Empresa: ").title()
+                if validar_nombre(nueva_empresa):
+                    cliente_encontrado["empresa"] = nueva_empresa
+                    print("✅ Nombre de empresa actualizado.")
+                    break
+                print("❌ El nombre de la empresa solo debe contener letras y espacios.")
+        
+        elif opcion == "2":  # Modificar representante
+            while True:
+                nuevo_representante = input("Nuevo representante legal: ").title()
+                if validar_nombre(nuevo_representante):
+                    cliente_encontrado["representante"] = nuevo_representante
+                    print("✅ Representante legal actualizado.")
+                    break
+                print("❌ El nombre del representante solo debe contener letras y espacios.")
+        
+        elif opcion == "3":  # Modificar correo
+            while True:
+                nuevo_correo = input("Nuevo correo: ").lower()
+                if validar_correo(nuevo_correo):
+                    cliente_encontrado["correo"] = nuevo_correo
+                    print("✅ Correo electrónico actualizado.")
+                    break
+                print("❌ Correo inválido. Intenta nuevamente.")
+        
+        elif opcion == "4":  # Modificar teléfono
+            while True:
+                nuevo_telefono = input("Nuevo teléfono: ")
+                if validar_telefono(nuevo_telefono):
+                    cliente_encontrado["telefono"] = nuevo_telefono
+                    print("✅ Teléfono actualizado.")
+                    break
+                print("❌ Teléfono inválido. Solo números, de 7 a 15 dígitos.")
+        
+        elif opcion == "5":  # Guardar cambios
+            cliente_encontrado["fecha"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            print("✅ Cambios guardados exitosamente.\n")
+            break
+        
+        elif opcion == "6":  # Salir sin guardar
+            print("❎ Cambios descartados. Volviendo al menú anterior.\n")
+            break
+        
         else:
-            print("❌ Nombre de empresa inválido. No se modificó.")
+            print("❌ Opción inválida. Intente nuevamente.")
 
-    # Modificar representante
-    nuevo_representante = input(f"Representante [{cliente_encontrado['representante']}]: ").title()
-    if nuevo_representante:
-        if validar_nombre(nuevo_representante):
-            cliente_encontrado['representante'] = nuevo_representante
-        else:
-            print("❌ Nombre del representante inválido. No se modificó.")
-
-    # Modificar correo
-    nuevo_correo = input(f"Correo [{cliente_encontrado['correo']}]: ").lower()
-    if nuevo_correo:
-        if validar_correo(nuevo_correo):
-            cliente_encontrado['correo'] = nuevo_correo
-        else:
-            print("❌ Correo inválido. No se modificó.")
-
-    # Modificar teléfono
-    nuevo_telefono = input(f"Teléfono [{cliente_encontrado['telefono']}]: ")
-    if nuevo_telefono:
-        if validar_telefono(nuevo_telefono):
-            cliente_encontrado['telefono'] = nuevo_telefono
-        else:
-            print("❌ Teléfono inválido. No se modificó.")
-
-    print("✅ Cliente modificado exitosamente.\n")
-#eliminar cliente en caso de que sea necesario
+#=================================eliminar cliente en caso de que sea necesario
 def eliminar_cliente(clientes):
     print("\n==== Eliminar Cliente ====")
     id_eliminar = input("Ingrese el ID del cliente a eliminar: ").strip()
@@ -278,7 +322,7 @@ def eliminar_cliente(clientes):
         print("❌ Cliente no encontrado.\n")
         return
 
-    # Mostrar información antes de confirmar
+    # ==============================Mostrar información antes de confirmar
     print("\n🗂️ Cliente encontrado:")
     print(f"ID: {cliente_encontrado['id']}")
     print(f"Empresa: {cliente_encontrado['empresa']}")
@@ -293,8 +337,8 @@ def eliminar_cliente(clientes):
         print("✅ Cliente eliminado exitosamente.\n")
     else:
         print("❎ Operación cancelada. No se eliminó ningún cliente.\n")
-#menu para registrar cliente desde el admin
-def registrar_cliente_admin():
+#================================menu para registrar cliente desde el admin
+def registrar_cliente_admin():# esta funcion mantiene todo el CRUD ya que es de roll administrativo 
     while True:
         print("\n===== Menú de Gestión de Clientes (Admin) =====")
         print("[1] Crear cliente")
@@ -325,8 +369,8 @@ def registrar_cliente_admin():
         else:
             print("❌ Opción inválida. Intente de nuevo.\n")
 #menu para registrar clientes desde el usuario vendedor
-def registrar_cliente_vendedor():
-    while True:
+def registrar_cliente_vendedor(): #esta funcion solo mantiene estas 2 opciones ya presentadas 
+    while True:                     #ya que es el vendedor 
         print("\n===== Menú de Clientes (Vendedor) =====")
         print("[1] Crear cliente")
         print("[2] Consultar clientes")
@@ -347,24 +391,23 @@ def registrar_cliente_vendedor():
 
         else:
             print("❌ Opción inválida. Intente de nuevo.\n")
-
+#==================================================  CRUD GESTION DE PRODUCTOS   =======================================
 def gestion_de_productos():
-    
-    
+        
     while True:
         print("\n====== MENÚ DE GESTIÓN DE PRODUCTOS ======")
-        print("1. Agregar producto")
-        print("2. Consultar productos")
-        print("3. Modificar producto")
-        print("4. Eliminar producto")
-        print("5. Salir")
+        print("[1] Agregar producto")
+        print("[2] Consultar productos")
+        print("[3] Modificar producto")
+        print("[4] Eliminar producto")
+        print("[5] Salir")
         
         opcion = input("Selecciona una opción (1-5): ").strip()
         
         if opcion == "1":
             agregar_producto(productos)
         elif opcion == "2":
-            consultar_productos(productos)
+            consultar_producto(productos)
         elif opcion == "3":
             modificar_producto(productos)
         elif opcion == "4":
@@ -373,7 +416,7 @@ def gestion_de_productos():
             print("¡Hasta luego!")
             break
         else:
-            print("Opción no válida. Por favor, ingresa un número del 1 al 5.")
+            print("!ERROR¡ Opción no válida. Por favor.")
 
 def agregar_producto(productos):
     print("\n==== Agregar Producto ====")
@@ -425,7 +468,7 @@ def agregar_producto(productos):
     print(f"\n✅ Producto '{nombre_producto}' agregado exitosamente!")
     print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")
 
-def consultar_productos(productos):
+def consultar_producto(productos):
     print("\n==== Consulta de Productos ====")
     
     if not productos:
@@ -448,46 +491,90 @@ def consultar_productos(productos):
         if not producto_encontrado:
             print(f"No se encontró producto con ID '{id_buscar}'.")
 
-def modificar_producto(productos):
+def modificar_producto(productos): # FACILITA LA MODIFICACION DEL PRDUCTO YA QUE PODEMOS ELEGIR CAMPO SOLICITADO
     print("\n==== Modificar Producto ====")
     
+    # Validar que existan productos registrados
     if not productos:
-        print("No hay productos para modificar.")
+        print("❌ No hay productos registrados para modificar.\n")
         return
     
-    id_producto_modificar = input("Ingrese el ID del producto a modificar: ").strip()
-    
+    # Mostrar lista de productos disponibles
+    print("\n📋 Lista de Productos Disponibles:")
     for producto in productos:
-        if producto['id'] == id_producto_modificar:
-            print(f"Producto encontrado: {producto['nombre']} (Precio: ${producto['precio']:.2f})")
-            
-            nuevo_nombre_producto = input("Nuevo nombre (Enter para dejar igual): ").strip().title()
-            if nuevo_nombre_producto != "":
-                producto['nombre'] = nuevo_nombre_producto
-            
-            nueva_descripcion_producto = input("Nueva descripción (Enter para dejar igual): ").strip()
-            if nueva_descripcion_producto != "":
-                producto['descripcion'] = nueva_descripcion_producto
-            
-            while True:
-                nuevo_precio_producto = input("Nuevo precio (Enter para dejar igual): ").strip()
-                if nuevo_precio_producto == "":
-                    break
-                try:
-                    nuevo_precio_float = float(nuevo_precio_producto)
-                    if nuevo_precio_float >= 0:
-                        producto['precio'] = nuevo_precio_float
-                        break
-                    else:
-                        print("❌ Error: El precio no puede ser negativo")
-                except ValueError:
-                    print("❌ Error: Debe ingresar un número válido")
-            
-            print("✅ Producto modificado correctamente.")
-            return
+        print(f"ID: {producto['id']} | Nombre: {producto['nombre']} | Precio: ${producto['precio']:.2f}")
     
-    print(f"No se encontró producto con ID '{id_producto_modificar}'.")
-
+    # Solicitar ID del producto a modificar
+    id_modificar = input("\nIngrese el ID del producto a modificar: ").strip()
+    
+    # Buscar producto
+    producto_encontrado = None
+    for producto in productos:
+        if producto["id"] == id_modificar:
+            producto_encontrado = producto
+            break
+    
+    if not producto_encontrado:
+        print("❌ Producto no encontrado.\n")
+        return
+    
+    # Mostrar información actual del producto
+    print("\n📝 Producto encontrado - Datos actuales:")
+    print(f"1. ID: {producto_encontrado['id']}")
+    print(f"2. Nombre: {producto_encontrado['nombre']}")
+    print(f"3. Descripción: {producto_encontrado['descripcion']}")
+    print(f"4. Precio: ${producto_encontrado['precio']:.2f}")
+    print(f"Fecha Registro: {producto_encontrado['fecha']}")
+    
+    # Menú de campos modificables
+    while True:
+        print("\nSeleccione el campo a modificar:")
+        print("[1] Nombre del Producto")
+        print("[2] Descripción")
+        print("[3] Precio")
+        print("[4] Guardar cambios y salir")
+        print("[5] Salir sin guardar")
+        
+        opcion = input("Opción: ").strip()
+        
+        if opcion == "1":  # Modificar nombre
+            while True:
+                nuevo_nombre = input("Nuevo nombre del producto: ").strip().title()
+                if nuevo_nombre:
+                    producto_encontrado["nombre"] = nuevo_nombre
+                    print("✅ Nombre del producto actualizado.")
+                    break
+                print("❌ El nombre no puede estar vacío.")
+        
+        elif opcion == "2":  # Modificar descripción
+            nueva_descripcion = input("Nueva descripción: ").strip()
+            producto_encontrado["descripcion"] = nueva_descripcion
+            print("✅ Descripción actualizada.")
+        
+        elif opcion == "3":  # Modificar precio
+            while True:
+                nuevo_precio = input("Nuevo precio: ").strip()
+                try:
+                    precio_float = float(nuevo_precio)
+                    if precio_float >= 0:
+                        producto_encontrado["precio"] = precio_float
+                        print("✅ Precio actualizado.")
+                        break
+                    print("❌ El precio no puede ser negativo.")
+                except ValueError:
+                    print("❌ Debe ingresar un número válido para el precio.")
+        
+        elif opcion == "4":  # Guardar cambios
+            producto_encontrado["fecha"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            print("✅ Cambios guardados exitosamente.\n")
+            break
+        
+        elif opcion == "5":  # Salir sin guardar
+            print("❎ Cambios descartados. Volviendo al menú anterior.\n")
+            break
+        
+        else:
+            print("❌ Opción inválida. Intente nuevamente.")
 def eliminar_producto(productos):
     print("\n==== Eliminar Producto ====")
     
@@ -509,4 +596,94 @@ def eliminar_producto(productos):
     
     print(f"No se encontró producto con ID '{id_producto_eliminar}'.")
 
+def registrar_pedido():
+    if not productos:
+        print("❌ No hay productos registrados. No se puede registrar el pedido.\n")
+        return
 
+    if not clientes:
+        print("❌ No hay clientes registrados. Debe registrar un cliente primero.\n")
+        return
+
+    nombre_cliente = input("Ingrese el nombre del cliente: ").strip()
+    if not nombre_cliente:
+        print("❌ El nombre del cliente no puede estar vacío.\n")
+        return
+
+    if nombre_cliente not in clientes:
+        print("❌ Cliente no encontrado. Debe registrarlo primero.\n")
+        return
+
+    producto = input("Ingrese el nombre del producto: ").strip()
+    if not producto:
+        print("❌ El nombre del producto no puede estar vacío.\n")
+        return
+
+    if producto not in productos:
+        print("❌ Producto no encontrado. Revise el nombre e intente nuevamente.\n")
+        return
+
+    color = input("Ingrese el color del producto: ").strip()
+    if not color:
+        print("❌ El color no puede estar vacío.\n")
+        return
+
+    talla = input("Ingrese la talla del producto: ").strip()
+    if not talla:
+        print("❌ La talla no puede estar vacía.\n")
+        return
+
+    try:
+        cantidad = int(input("Ingrese la cantidad: ").strip())
+        if cantidad <= 0:
+            print("❌ La cantidad debe ser mayor a cero.\n")
+            return
+    except ValueError:
+        print("❌ La cantidad debe ser un número entero válido.\n")
+        return
+
+    try:
+        precio_unitario = float(input("Ingrese el precio unitario: ").strip())
+        if precio_unitario <= 0:
+            print("❌ El precio debe ser mayor a cero.\n")
+            return
+    except ValueError:
+        print("❌ El precio debe ser un número válido.\n")
+        return
+
+    subtotal = cantidad * precio_unitario
+    iva = subtotal * 0.19
+    total = subtotal + iva
+
+    pedido = {
+        "cliente": nombre_cliente,
+        "producto": producto,
+        "color": color,
+        "talla": talla,
+        "cantidad": cantidad,
+        "precio_unitario": precio_unitario,
+        "subtotal": subtotal,
+        "iva": iva,
+        "total": total
+    }
+
+    pedidos.append(pedido)
+    print("\n✅ Pedido registrado exitosamente.\n")
+
+
+
+
+# ================== FLUJO PRINCIPAL ==================
+def programa():#=======================================================================
+    while True:
+        resultado = menu_usuario()
+        if resultado:
+            rol, usuario = resultado
+            menu_principal(rol)
+        else:
+            print("Acceso denegado o máximo de intentos fallidos.")
+            break
+
+programa()
+
+# ================== EJECUTAR ==================
