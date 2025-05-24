@@ -418,55 +418,56 @@ def gestion_de_productos():
         else:
             print("!ERROR¡ Opción no válida. Por favor.")
 
+# Función para generar automáticamente un código de producto único
+def generar_codigo_producto(productos):
+    numero = len(productos) + 1  # Calcula el siguiente número basado en la cantidad de productos existentes
+    return f"PRO{numero:03d}"    # Devuelve un código con formato 'PRO001', 'PRO002', etc.
+
+# Función para agregar un nuevo producto a la lista de productos
 def agregar_producto(productos):
-    print("\n==== Agregar Producto ====")
-    
-    id_valido = False
-    while not id_valido:
-        id_producto = input("ID del producto: ").strip()
-        
-        if not id_producto:
-            print("El ID no puede estar vacío.")
-        elif not id_producto.isalnum():
-            print("El ID solo puede contener letras y números.")
-        elif any(producto['id'] == id_producto for producto in productos):
-            print("Este ID ya existe. Por favor, ingresa uno diferente.")
-        else:
-            id_valido = True
-    
-    nombre_valido = False
+    print("\n==== Agregar Producto ====")  
+    # Generar ID automáticamente basado en la cantidad de productos
+    id_producto = generar_codigo_producto(productos)
+    print(f"ID generado automáticamente: {id_producto}")  # Muestra el ID generado
+
+    # Validación del nombre del producto (no puede estar vacío)
+    nombre_valido = False #Se usa para repetir el ingreso del nombre del producto hasta que el usuario ingrese algo válido
     while not nombre_valido:
-        nombre_producto = input("Nombre del producto: ").strip().title()
+        nombre_producto = input("Nombre del producto: ").strip().title()  # Limpia y convierte a formato título
         if nombre_producto != "":
-            nombre_valido = True
+            nombre_valido = True  # El nombre es válido
         else:
-            print("❌ Error: El nombre no puede estar vacío")
-    
+            print("❌ Error: El nombre no puede estar vacío")  # Mensaje de error si está vacío
+
+    # Solicitar una descripción opcional del producto
     descripcion_producto = input("Descripción: ").strip()
-    
+
+    # Validación del precio (debe ser un número positivo o cero)
     precio_valido = False
     while not precio_valido:
-        precio_input = input("Precio: ").strip()
+        precio_input = input("Precio: ").strip()  # Entrada del precio
         try:
-            precio_producto = float(precio_input)
+            precio_producto = float(precio_input)  # Intentar convertir a número flotante
             if precio_producto >= 0:
-                precio_valido = True
+                precio_valido = True  # El precio es válido
             else:
-                print("❌ Error: El precio no puede ser negativo")
+                print("❌ Error: El precio no puede ser negativo")  # Precio menor a 0 no es permitido
         except ValueError:
-            print("❌ Error: Debe ingresar un número válido")
-    
+            print("❌ Error: Debe ingresar un número válido")  # Entrada no numérica
+
+    # Crear un diccionario que representa al nuevo producto
     nuevo_producto = {
-        "id": id_producto,
-        "nombre": nombre_producto,
-        "descripcion": descripcion_producto,
-        "precio": precio_producto,
-        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "id": id_producto,  # ID generado automáticamente
+        "nombre": nombre_producto,  # Nombre validado
+        "descripcion": descripcion_producto,  # Descripción opcional
+        "precio": precio_producto,  # Precio validado
+        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Fecha y hora actual en formato legible
     }
-    
-    productos.append(nuevo_producto)
-    print(f"\n✅ Producto '{nombre_producto}' agregado exitosamente!")
-    print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")
+
+    productos.append(nuevo_producto)  # Agrega el nuevo producto a la lista de productos
+    print(f"\n✅ Producto '{nombre_producto}' agregado exitosamente!")  # Mensaje de éxito
+    print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")  # Muestra el ID y precio del producto
+
 
 def consultar_producto(productos):
     print("\n==== Consulta de Productos ====")
