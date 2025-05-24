@@ -129,7 +129,7 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
                 print("Opción inválida. Intente nuevamente.")
 
 
-        elif rol == "produccion":
+        elif rol == "produccion":   #opciones disponibles del vendedor
             if opcion == 1:
                 gestion_de_productos()
             elif opcion == 2:
@@ -312,11 +312,11 @@ def eliminar_cliente(clientes):
     print("\n==== Eliminar Cliente ====")
     id_eliminar = input("Ingrese el ID del cliente a eliminar: ").strip()
 
-    cliente_encontrado = None
-    for cliente in clientes:
+    cliente_encontrado = None   # variable temporal que almacena el cliente que coincide con el ID buscado
+    for cliente in clientes:    #none indica que el cliente no ha sido encontrado
         if cliente["id"] == id_eliminar:
             cliente_encontrado = cliente
-            break
+            break #detenemos el ciclo para que ya no siga buscando despues de encontarlo
 
     if not cliente_encontrado:
         print("❌ Cliente no encontrado.\n")
