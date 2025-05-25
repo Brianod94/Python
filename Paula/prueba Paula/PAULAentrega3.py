@@ -1,18 +1,166 @@
 from datetime import datetime
 import re
-# diccionarios para usuarios 
-user1 = {"B orozco": "admin1234"}
-user2 = {"K puerta": "local1234"}
-user3 = {"J martinez": "produ1234"}
-#listas para almacenar la informacion
 clientes = []
-inventario = []
 pedidos = []    
 productos = []
-#aqui creo una lista con las tallas y los colores disponibles
 tallas_disponibles = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]
-colores_disponibles = ["azul", "caqui", "naranja"]  
+colores_disponibles = ["azul", "caqui", "naranja"] 
+contador = 0
+# Lista de usuarios existentes
+users = [
+    {"nombre_usuario": "Borozco", "contraseña": "4321", "rol": "admin"},
+    {"nombre_usuario": "Kpuerta", "contraseña": "1234", "rol": "vendedor"},
+    {"nombre_usuario": "Jmarti", "contraseña": "canalete", "rol": "produccion"}
+]
 
+roles_permitidos = ['admin', 'vendedor', 'produccion']
+
+# Función para validar rol
+def rol_es_valido(rol):
+    return rol.lower() in roles_permitidos
+
+# Menú de gestión de usuarios
+def Gestion_usuarios():
+    while True:
+        print("\n===== Menú de Gestión de Usuarios =====")
+        print("[1] Crear Usuario")
+        print("[2] Consultar Usuarios")
+        print("[3] Modificar Usuario")
+        print("[4] Eliminar Usuario")
+        print("[5] Salir")
+        print("=======================================")
+
+        opcion = input("Seleccione una opción: ").strip()
+
+        if opcion == "1":
+            registrar_usuario()
+
+        elif opcion == "2":
+            consultar_usuarios()
+
+        elif opcion == "3":
+            modificar_usuarios()
+
+        elif opcion == "4":
+            eliminar_usuario()
+
+        elif opcion == "5":
+            print("🔙 Volviendo al menú anterior...\n")
+            break
+
+        else:
+            print("❌ Opción inválida. Intente de nuevo.\n")
+
+# Registrar nuevo usuario
+def registrar_usuario():
+    nombre_usuario = input("Nombre de usuario: ").strip()
+    contraseña = input("Ingrese contraseña: ").strip()
+    rol = input("Ingrese el rol asignado (admin, vendedor, produccion): ").strip().lower()
+
+    if any(u['nombre_usuario'] == nombre_usuario for u in users):
+        print(f"❌ El usuario '{nombre_usuario}' ya existe.")
+        return
+
+    if not rol_es_valido(rol):
+        print(f"❌ Rol inválido. Roles permitidos: {roles_permitidos}")
+        return
+
+    nuevo_usuario = {
+        "nombre_usuario": nombre_usuario,
+        "contraseña": contraseña,
+        "rol": rol
+    }
+    users.append(nuevo_usuario)
+    print(f"✅ Usuario '{nombre_usuario}' registrado como '{rol}'.")
+
+# Consultar usuarios
+def consultar_usuarios():
+    if not users:
+        print("No hay usuarios registrados.")
+        return
+    print("\n📋 Lista de usuarios:")
+    for u in users:
+        print(f"Usuario: {u['nombre_usuario']}, Rol: {u['rol']}")
+
+# Modificar usuario
+def modificar_usuarios():
+    nombre = input("Ingrese el nombre del usuario a modificar: ").strip()
+
+    usuario = next((u for u in users if u["nombre_usuario"] == nombre), None)
+
+    if not usuario:
+        print("❌ Usuario no encontrado.")
+        return
+
+    print(f"Usuario encontrado: {usuario}")
+
+    while True:
+        print("\nCampos disponibles:")
+        print("[1] Nombre de usuario")
+        print("[2] Contraseña")
+        print("[3] Rol")
+        print("[4] Guardar y salir")
+        print("[5] Cancelar cambios")
+
+        opcion = input("Opción: ").strip()
+
+        if opcion == "1":
+            nuevo_nombre = input("Nuevo nombre de usuario: ").strip()
+            if any(u['nombre_usuario'] == nuevo_nombre for u in users):
+                print("❌ Ese nombre de usuario ya existe.")
+            else:
+                usuario["nombre_usuario"] = nuevo_nombre
+                print("✅ Nombre actualizado.")
+
+        elif opcion == "2":
+            nueva_contra = input("Nueva contraseña: ").strip()
+            usuario["contraseña"] = nueva_contra
+            print("✅ Contraseña actualizada.")
+
+        elif opcion == "3":
+            nuevo_rol = input("Nuevo rol: ").strip().lower()
+            if rol_es_valido(nuevo_rol):
+                usuario["rol"] = nuevo_rol
+                print("✅ Rol actualizado.")
+            else:
+                print(f"❌ Rol inválido. Roles permitidos: {roles_permitidos}")
+
+        elif opcion == "4":
+            print("✅ Cambios guardados.")
+            break
+
+        elif opcion == "5":
+            print("❎ Cambios descartados.")
+            break
+
+        else:
+            print("❌ Opción inválida.")
+
+# Eliminar usuario
+def eliminar_usuario():
+    nombre = input("Ingrese el nombre del usuario a eliminar: ").strip()
+    usuario = next((u for u in users if u["nombre_usuario"] == nombre), None)
+
+    if not usuario:
+        print("❌ Usuario no encontrado.")
+        return
+
+    print(f"Usuario encontrado: {usuario}")
+    confirmacion = input("¿Desea eliminar este usuario? (s/n): ").strip().lower()
+
+    if confirmacion == 's':
+        users.remove(usuario)
+        print("✅ Usuario eliminado.")
+    else:
+        print("❎ Operación cancelada.")
+
+
+
+# funcion para crear codigos automaticos
+def generar_codigo():
+    global contador
+    contador += 1
+    return f'PRO{contador:03d}'
 #============funciones para validar===========
 def validar_correo(correo):
     # Patrón para validar correos comunes (usuario@dominio.ext)
@@ -41,35 +189,32 @@ def menu_usuario():
         opc = input("Ingrese la opción para iniciar sesión: ")
 
         if opc == "1":
-            usuario = autenticador_usuario(user1, "admin")
+            usuario = autenticador_usuario(users, "admin")
             if usuario:
                 return ("admin", usuario)
         elif opc == "2":
-            usuario = autenticador_usuario(user2, "vendedor")
+            usuario = autenticador_usuario(users, "vendedor")
             if usuario:
                 return ("vendedor", usuario)
         elif opc == "3":
-            usuario = autenticador_usuario(user3, "produccion")
+            usuario = autenticador_usuario(users, "produccion")
             if usuario:
                 return ("produccion", usuario)
         else:
             print("Opción inválida, intente nuevamente.")
 #======permite autenticar un usuario verificando que su nombre y contraseña 
-def autenticador_usuario(usuarios_dict, rol, max_intentos=3):
-    intentos = 0
-    while intentos < max_intentos:
+def autenticador_usuario(users, rol_esperado, max_intentos=3):
+    for intento in range(max_intentos):
         user = input("Ingrese Usuario: ")
-        password = input("Contraseña: ") 
-        
-        if user in usuarios_dict and usuarios_dict[user] == password:
-            print("\n===========================================================")
-            print(f"----------------¡Bienvenido {user.capitalize()}!------------------")
-            print("===========================================================")
-            return user
-        else:
-            intentos += 1
-            print("\nUsuario o contraseña incorrectos.\n")
-            print(f"Intentos restantes: {max_intentos - intentos}\n")
+        contraseña = input("Contraseña: ")
+        for usuario in users:
+            if usuario["nombre_usuario"] == user and usuario["contraseña"] == contraseña and usuario["rol"] == rol_esperado:
+                print(f"\n✅ ¡Bienvenido {user}!\n")
+                return user
+        print("❌ Usuario o contraseña incorrectos.")
+    print("🔒 Acceso denegado por intentos fallidos.\n")
+    return None
+
 
     print("Demasiados intentos fallidos. Acceso denegado.\n")
     return None
@@ -81,7 +226,8 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
         if rol == "admin":
             print("[1] Gestión de Clientes")
             print("[2] Valores Definitivos (Pedidos)")
-            print("[3] Cerrar Sesión")
+            print("[3] registrar nuevos usuarios")
+            print("[4] Cerrar Sesión")
 
         elif rol == "vendedor":
             print("[1] Consultar productos disponibles")
@@ -109,6 +255,8 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
             elif opcion == 2:
                 listar_pedidos()
             elif opcion == 3:
+                Gestion_usuarios()
+            elif opcion == 4:
                 print("Cerrando sesión...\n")
                 break
             else:
@@ -129,7 +277,7 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
                 print("Opción inválida. Intente nuevamente.")
 
 
-        elif rol == "produccion":   #opciones disponibles del vendedor
+        elif rol == "produccion":
             if opcion == 1:
                 gestion_de_productos()
             elif opcion == 2:
@@ -185,6 +333,8 @@ def crear_cliente(clientes):
     }
     clientes.append(cliente) #este diccionario se guarda dentro de la lista clientes 
     print(f"✅ Cliente creado exitosamente el {cliente['fecha']}.\n")
+    
+    
 # consultar clientes ya creados
 def consultar_cliente(clientes):
     print("\n==== Consultar Clientes ====")
@@ -306,17 +456,16 @@ def modificar_cliente(clientes):
         
         else:
             print("❌ Opción inválida. Intente nuevamente.")
-
 #=================================eliminar cliente en caso de que sea necesario
 def eliminar_cliente(clientes):
     print("\n==== Eliminar Cliente ====")
     id_eliminar = input("Ingrese el ID del cliente a eliminar: ").strip()
 
-    cliente_encontrado = None   # variable temporal que almacena el cliente que coincide con el ID buscado
-    for cliente in clientes:    #none indica que el cliente no ha sido encontrado
+    cliente_encontrado = None
+    for cliente in clientes:
         if cliente["id"] == id_eliminar:
             cliente_encontrado = cliente
-            break #detenemos el ciclo para que ya no siga buscando despues de encontarlo
+            break
 
     if not cliente_encontrado:
         print("❌ Cliente no encontrado.\n")
@@ -393,7 +542,6 @@ def registrar_cliente_vendedor(): #esta funcion solo mantiene estas 2 opciones y
             print("❌ Opción inválida. Intente de nuevo.\n")
 #==================================================  CRUD GESTION DE PRODUCTOS   =======================================
 def gestion_de_productos():
-        
     while True:
         print("\n====== MENÚ DE GESTIÓN DE PRODUCTOS ======")
         print("[1] Agregar producto")
@@ -418,56 +566,56 @@ def gestion_de_productos():
         else:
             print("!ERROR¡ Opción no válida. Por favor.")
 
-# Función para generar automáticamente un código de producto único
-def generar_codigo_producto(productos):
-    numero = len(productos) + 1  # Calcula el siguiente número basado en la cantidad de productos existentes
-    return f"PRO{numero:03d}"    # Devuelve un código con formato 'PRO001', 'PRO002', etc.
-
-# Función para agregar un nuevo producto a la lista de productos
 def agregar_producto(productos):
-    print("\n==== Agregar Producto ====")  
-    # Generar ID automáticamente basado en la cantidad de productos
-    id_producto = generar_codigo_producto(productos)
-    print(f"ID generado automáticamente: {id_producto}")  # Muestra el ID generado
-
-    # Validación del nombre del producto (no puede estar vacío)
-    nombre_valido = False #Se usa para repetir el ingreso del nombre del producto hasta que el usuario ingrese algo válido
+    print("\n==== Agregar Producto ====")
+    
+    #id_valido = False
+    #while not id_valido:
+    #    id_producto = input("ID del producto: ").strip()
+    #    
+    #    if not id_producto:
+    #        print("El ID no puede estar vacío.")
+    #    elif not id_producto.isalnum():
+    #        print("El ID solo puede contener letras y números.")
+    #    elif any(producto['id'] == id_producto for producto in productos):
+    #        print("Este ID ya existe. Por favor, ingresa uno diferente.")
+    #    else:
+    #        id_valido = True
+    
+    nombre_valido = False
     while not nombre_valido:
-        nombre_producto = input("Nombre del producto: ").strip().title()  # Limpia y convierte a formato título
+        nombre_producto = input("Nombre del producto: ").strip().title()
         if nombre_producto != "":
-            nombre_valido = True  # El nombre es válido
+            nombre_valido = True
         else:
-            print("❌ Error: El nombre no puede estar vacío")  # Mensaje de error si está vacío
-
-    # Solicitar una descripción opcional del producto
+            print("❌ Error: El nombre no puede estar vacío")
+    
     descripcion_producto = input("Descripción: ").strip()
-
-    # Validación del precio (debe ser un número positivo o cero)
+    
     precio_valido = False
     while not precio_valido:
-        precio_input = input("Precio: ").strip()  # Entrada del precio
+        precio_input = input("Precio: ").strip()
         try:
-            precio_producto = float(precio_input)  # Intentar convertir a número flotante
+            precio_producto = float(precio_input)
             if precio_producto >= 0:
-                precio_valido = True  # El precio es válido
+                precio_valido = True
             else:
-                print("❌ Error: El precio no puede ser negativo")  # Precio menor a 0 no es permitido
+                print("❌ Error: El precio no puede ser negativo")
         except ValueError:
-            print("❌ Error: Debe ingresar un número válido")  # Entrada no numérica
+            print("❌ Error: Debe ingresar un número válido")
 
-    # Crear un diccionario que representa al nuevo producto
+    id_producto = generar_codigo()
     nuevo_producto = {
-        "id": id_producto,  # ID generado automáticamente
-        "nombre": nombre_producto,  # Nombre validado
-        "descripcion": descripcion_producto,  # Descripción opcional
-        "precio": precio_producto,  # Precio validado
-        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Fecha y hora actual en formato legible
+        "id": id_producto,
+        "nombre": nombre_producto,
+        "descripcion": descripcion_producto,
+        "precio": precio_producto,
+        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
-
-    productos.append(nuevo_producto)  # Agrega el nuevo producto a la lista de productos
-    print(f"\n✅ Producto '{nombre_producto}' agregado exitosamente!")  # Mensaje de éxito
-    print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")  # Muestra el ID y precio del producto
-
+    
+    productos.append(nuevo_producto)
+    print(f"\n✅ Producto '{nombre_producto}' agregado exitosamente!")
+    print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")
 
 def consultar_producto(productos):
     print("\n==== Consulta de Productos ====")
@@ -598,8 +746,7 @@ def eliminar_producto(productos):
     print(f"No se encontró producto con ID '{id_producto_eliminar}'.")
 
 def registrar_pedido():
-    print("\n📦 === Registrar Pedido ===")
-
+    # Validaciones iniciales
     if not productos:
         print("❌ No hay productos registrados.\n")
         return
@@ -607,116 +754,79 @@ def registrar_pedido():
         print("❌ No hay clientes registrados.\n")
         return
 
-    # Menú de clientes
-    print("\n👥 Clientes disponibles:")
-    for indice, cliente in enumerate(clientes, start=1):
-        print(f"{indice}. {cliente['empresa']} (ID: {cliente['id']})")
+    # Buscar cliente
+    print("\nClientes disponibles:")
+    for cliente in clientes:
+        print(f"ID: {cliente['id']} - {cliente['empresa']}")
+    
+    id_cliente = input("\nIngrese ID del cliente: ").strip()
+    cliente_encontrado = next((c for c in clientes if c["id"] == id_cliente), None)
+    
+    if not cliente_encontrado:
+        print("❌ Cliente no encontrado.\n")
+        return
 
-    cliente_encontrado = None
-    while cliente_encontrado is None:
-        try:
-            seleccion_cliente = int(input("\nSeleccione el número del cliente: "))
-            if 1 <= seleccion_cliente <= len(clientes):
-                cliente_encontrado = clientes[seleccion_cliente - 1]
-            else:
-                print("❌ Número fuera de rango.")
-        except ValueError:
-            print("❌ Ingrese un número válido.")
+    # Buscar producto
+    print("\nProductos disponibles:")
+    for producto in productos:
+        print(f"ID: {producto['id']} - {producto['nombre']} (${producto['precio']})")
+    
+    id_producto = input("\nIngrese ID del producto: ").strip()
+    producto_encontrado = next((p for p in productos if p["id"] == id_producto), None)
+    
+    if not producto_encontrado:
+        print("❌ Producto no encontrado.\n")
+        return
 
-    # Agregar varios productos
-    agregar_otro_producto = "s"
-    while agregar_otro_producto.lower() == "s":
-        # Menú de productos
-        print("\n🛍️ Productos disponibles:")
-        for indice, producto in enumerate(productos, start=1):
-            print(f"{indice}. {producto['nombre']} - ${producto['precio']:,} (ID: {producto['id']})")
+    # Selección de talla y color
+    print(f"\nTallas disponibles: {', '.join(tallas_disponibles)}")
+    talla = input("Talla (ej. M): ").strip().upper()
+    if talla not in tallas_disponibles:
+        print("❌ Talla no disponible.\n")
+        return
 
-        producto_encontrado = None
-        while producto_encontrado is None:
-            try:
-                seleccion_producto = int(input("\nSeleccione el número del producto: "))
-                if 1 <= seleccion_producto <= len(productos):
-                    producto_encontrado = productos[seleccion_producto - 1]
-                else:
-                    print("❌ Número fuera de rango.")
-            except ValueError:
-                print("❌ Ingrese un número válido.")
+    print(f"\nColores disponibles: {', '.join(colores_disponibles)}")
+    color = input("Color (ej. azul): ").strip().lower()
+    if color not in colores_disponibles:
+        print("❌ Color no disponible.\n")
+        return
 
-        # Menú de tallas
-        print("\n📏 Tallas disponibles:")
-        for i, talla in enumerate(tallas_disponibles, start=1):
-            print(f"{i}. {talla}")
-        talla_ingresada = ""
-        while talla_ingresada == "":
-            try:
-                seleccion_talla = int(input("Seleccione el número de la talla: "))
-                if 1 <= seleccion_talla <= len(tallas_disponibles):
-                    talla_ingresada = tallas_disponibles[seleccion_talla - 1]
-                else:
-                    print("❌ Número fuera de rango.")
-            except ValueError:
-                print("❌ Ingrese un número válido.")
+    # Cantidad
+    try:
+        cantidad = int(input("Cantidad: "))
+        if cantidad <= 0:
+            print("❌ La cantidad debe ser positiva.\n")
+            return
+    except ValueError:
+        print("❌ Ingrese un número válido.\n")
+        return
 
-        # Menú de colores
-        print("\n🎨 Colores disponibles:")
-        for i, color in enumerate(colores_disponibles, start=1):
-            print(f"{i}. {color}")
-        color_ingresado = ""
-        while color_ingresado == "":
-            try:
-                seleccion_color = int(input("Seleccione el número del color: "))
-                if 1 <= seleccion_color <= len(colores_disponibles):
-                    color_ingresado = colores_disponibles[seleccion_color - 1]
-                else:
-                    print("❌ Número fuera de rango.")
-            except ValueError:
-                print("❌ Ingrese un número válido.")
+    # Cálculos
+    precio_unitario = producto_encontrado["precio"]
+    subtotal = cantidad * precio_unitario
+    iva = subtotal * 0.19
+    total = subtotal + iva
 
-        # Cantidad
-        try:
-            cantidad_ingresada = int(input("🧮 Ingrese la cantidad: "))
-            if cantidad_ingresada <= 0:
-                print("❌ La cantidad debe ser mayor que 0.\n")
-                continue
-        except ValueError:
-            print("❌ Por favor ingrese un número válido.\n")
-            continue
+    # Crear pedido
+    pedido = {
+        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "id_cliente": id_cliente,
+        "cliente_nombre": cliente_encontrado["empresa"],
+        "id_producto": id_producto,
+        "producto_nombre": producto_encontrado["nombre"],
+        "color": color,
+        "talla": talla,
+        "cantidad": cantidad,
+        "precio_unitario": precio_unitario,
+        "subtotal": subtotal,
+        "iva": iva,
+        "total": total
+    }
 
-        # Cálculos
-        precio_unitario = producto_encontrado["precio"]
-        subtotal = cantidad_ingresada * precio_unitario
-        iva = subtotal * 0.19
-        total = subtotal + iva
+    pedidos.append(pedido)
+    print(f"\n✅ Pedido registrado (Total: ${total:.2f})\n")
 
-        # Crear pedido
-        nuevo_pedido = {
-            "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "id_cliente": cliente_encontrado["id"],
-            "cliente_nombre": cliente_encontrado["empresa"],
-            "id_producto": producto_encontrado["id"],
-            "producto_nombre": producto_encontrado["nombre"],
-            "color": color_ingresado,
-            "talla": talla_ingresada,
-            "cantidad": cantidad_ingresada,
-            "precio_unitario": precio_unitario,
-            "subtotal": subtotal,
-            "iva": iva,
-            "total": total
-        }
-
-        pedidos.append(nuevo_pedido)
-        guardar_datos()
-
-        print(f"\n✅ Producto agregado al pedido (Total con IVA: ${total:,.2f})")
-
-        # ¿Agregar otro producto?
-        agregar_otro_producto = input("\n➕ ¿Desea agregar otro producto al mismo pedido? (s/n): ").strip().lower()
-        while agregar_otro_producto not in ["s", "n"]:
-            agregar_otro_producto = input("❓ Respuesta inválida. Ingrese 's' o 'n': ").strip().lower()
-
-    print("\n✅ Pedido finalizado y registrado correctamente.\n")
-
-def listar_pedidos():#=========================================listar pedidos===================
+def listar_pedidos():
     print("\n==== Listado de Pedidos ====")
     
     if not pedidos:
@@ -743,15 +853,21 @@ def listar_pedidos():#=========================================listar pedidos===
     print(f"{'TOTAL GENERAL:':<63} ${total_general:>9.2f}")
     print("-" * 80)
 
-
-
+def consultar_productos_disponibles():
+    print("\n==== Productos Disponibles ====")
+    if not productos:
+        print("No hay productos registrados.")
+        return
+    
+    for producto in productos:
+        print(f"ID: {producto['id']} | {producto['nombre']:20} | Precio: ${producto['precio']:,}")
 
 # ================== FLUJO PRINCIPAL ==================
 def programa():#=======================================================================
     while True:
         resultado = menu_usuario()
         if resultado:
-            rol, usuario = resultado
+            rol, usuarios = resultado
             menu_principal(rol)
         else:
             print("Acceso denegado o máximo de intentos fallidos.")

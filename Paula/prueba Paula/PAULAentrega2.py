@@ -1,33 +1,133 @@
 from datetime import datetime
 import re
-# diccionarios para usuarios 
-user1 = {"B orozco": "admin1234"}
-user2 = {"K puerta": "local1234"}
-user3 = {"J martinez": "produ1234"}
-#listas para almacenar la informacion
+
+# Diccionarios para usuarios 
+user1 = {"Borozco": "admin1234"}
+user2 = {"Kpuerta": "local1234"}
+user3 = {"Jmartinez": "produ1234"}
+
+# Listas para almacenar la información
 clientes = []
 inventario = []
 pedidos = []    
 productos = []
-#aqui creo una lista con las tallas y los colores disponibles
-tallas_disponibles = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]
-colores_disponibles = ["azul", "caqui", "naranja"]  
 
-#============funciones para validar===========
+# Listas con las tallas y colores disponibles
+tallas_disponibles = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]
+colores_disponibles = ["azul", "caqui", "naranja"] 
+contador = 0
+# ================== VARIABLES GLOBALES ==================
+
+# Listas para almacenar la información (ahora se cargarán desde archivos)
+clientes = []
+inventario = []
+pedidos = []    
+productos = []
+
+# Listas con las tallas y colores disponibles
+tallas_disponibles = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]
+colores_disponibles = ["azul", "caqui", "naranja"] 
+contador = 0
+
+# ================== SISTEMA DE ARCHIVOS ==================
+def guardar_datos():
+    """Guarda todas las listas en archivos .txt para persistencia de datos"""
+    try:
+        # Guardar clientes
+        with open('clientes.txt', 'w') as f: #open es un metodo que permite trabajar con archivos "W" es modo de apertura para escribir
+            for cliente in clientes:
+                linea = f"{cliente['id']}|{cliente['empresa']}|{cliente['representante']}|{cliente['correo']}|{cliente['telefono']}|{cliente['fecha']}\n"
+                f.write(linea)
+        
+        # Guardar productos
+        with open('productos.txt', 'w') as f:
+            for producto in productos:
+                linea = f"{producto['id']}|{producto['nombre']}|{producto['descripcion']}|{producto['precio']}|{producto['fecha']}\n"
+                f.write(linea)
+        
+        # Guardar pedidos
+        with open('pedidos.txt', 'w') as f:
+            for pedido in pedidos:
+                linea = f"{pedido['fecha']}|{pedido['id_cliente']}|{pedido['cliente_nombre']}|{pedido['id_producto']}|{pedido['producto_nombre']}|{pedido['color']}|{pedido['talla']}|{pedido['cantidad']}|{pedido['precio_unitario']}|{pedido['subtotal']}|{pedido['iva']}|{pedido['total']}\n"
+                f.write(linea)
+    except Exception as e:
+        print(f"Error al guardar datos: {e}")
+
+def cargar_datos():
+    """Carga los datos desde archivos .txt al iniciar el programa"""
+    global clientes, productos, pedidos
+    
+    # Cargar clientes
+    try:
+        with open('clientes.txt', 'r') as f:
+            for linea in f:
+                datos = linea.strip().split('|')
+                clientes.append({
+                    'id': datos[0],
+                    'empresa': datos[1],
+                    'representante': datos[2],
+                    'correo': datos[3],
+                    'telefono': datos[4],
+                    'fecha': datos[5]
+                })
+    except FileNotFoundError:
+        print("Archivo de clientes no encontrado. Se creará uno nuevo.")
+    
+    # Cargar productos
+    try:
+        with open('productos.txt', 'r') as f:
+            for linea in f:
+                datos = linea.strip().split('|')
+                productos.append({
+                    'id': datos[0],
+                    'nombre': datos[1],
+                    'descripcion': datos[2],
+                    'precio': float(datos[3]),
+                    'fecha': datos[4]
+                })
+    except FileNotFoundError:
+        print("Archivo de productos no encontrado. Se creará uno nuevo.")
+    
+    # Cargar pedidos
+    try:
+        with open('pedidos.txt', 'r') as f:
+            for linea in f:
+                datos = linea.strip().split('|')
+                pedidos.append({
+                    'fecha': datos[0],
+                    'id_cliente': datos[1],
+                    'cliente_nombre': datos[2],
+                    'id_producto': datos[3],
+                    'producto_nombre': datos[4],
+                    'color': datos[5],
+                    'talla': datos[6],
+                    'cantidad': int(datos[7]),
+                    'precio_unitario': float(datos[8]),
+                    'subtotal': float(datos[9]),
+                    'iva': float(datos[10]),
+                    'total': float(datos[11])
+                })
+    except FileNotFoundError:
+        print("Archivo de pedidos no encontrado. Se creará uno nuevo.")
+# Función para crear códigos automáticos
+def generar_codigo():
+    global contador
+    contador += 1
+    return f'PRO{contador:03d}'
+
+# ============ Funciones para validar ============
 def validar_correo(correo):
-    # Patrón para validar correos comunes (usuario@dominio.ext)
     patron = r'^[\w\.-]+@[\w\.-]+\.\w+$'
     return re.match(patron, correo) is not None
 
 def validar_telefono(telefono):
-    # Valida que solo contenga dígitos y que la longitud esté entre 7 y 15
     return telefono.isdigit() and 7 <= len(telefono) <= 15
 
-def validar_nombre(nombre): # No se permiten dígitos ni símbolos adicionales.
-    # Permite solo letras (mayúsculas y minúsculas) y espacios.
+def validar_nombre(nombre):
     patron = r'^[A-Za-z\s]+$'
     return re.match(patron, nombre) is not None
-#permite al usuario elegir un rol de inicio de sesión (Administrador, Vendedor o Producción)
+
+# Función para el menú de inicio de sesión
 def menu_usuario():
     while True:
         print("\n================ INICIO DE SESION =========================")
@@ -54,7 +154,8 @@ def menu_usuario():
                 return ("produccion", usuario)
         else:
             print("Opción inválida, intente nuevamente.")
-#======permite autenticar un usuario verificando que su nombre y contraseña 
+
+# Función para autenticar usuarios
 def autenticador_usuario(usuarios_dict, rol, max_intentos=3):
     intentos = 0
     while intentos < max_intentos:
@@ -73,18 +174,19 @@ def autenticador_usuario(usuarios_dict, rol, max_intentos=3):
 
     print("Demasiados intentos fallidos. Acceso denegado.\n")
     return None
-# opciones de menu duacuerdo al rol solicitado 
-def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado 
-    while True:             #cada roll ya tiene opciones predefinidas 
+
+# Menú principal según rol
+def menu_principal(rol):
+    while True:
         print("\n================ MENÚ PRINCIPAL ===========================")
 
         if rol == "admin":
             print("[1] Gestión de Clientes")
-            print("[2] Valores Definitivos (Pedidos)")
+            print("[2] Consultar pedidos realizados")
             print("[3] Cerrar Sesión")
 
         elif rol == "vendedor":
-            print("[1] Consultar productos disponibles")
+            print("[1] Consultar pedidos realizados")
             print("[2] Gestión de Pedidos")
             print("[3] Gestión de Clientes")
             print("[4] Cerrar Sesión")
@@ -102,8 +204,8 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
         except ValueError:
             print("Por favor, ingrese un número válido.\n")
             continue
-        # Lógica según rol
-        if rol == "admin": # opciones disponibles del admin
+
+        if rol == "admin":
             if opcion == 1:
                 registrar_cliente_admin()
             elif opcion == 2:
@@ -114,10 +216,9 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
             else:
                 print("Opción inválida.\n")
 
-        elif rol == "vendedor": #opciones disponibles del vendedor
-
+        elif rol == "vendedor":
             if opcion == 1:
-                consultar_productos_disponibles()
+                listar_pedidos()
             elif opcion == 2:
                 registrar_pedido()
             elif opcion == 3:
@@ -128,8 +229,7 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
             else:
                 print("Opción inválida. Intente nuevamente.")
 
-
-        elif rol == "produccion":   #opciones disponibles del vendedor
+        elif rol == "produccion":
             if opcion == 1:
                 gestion_de_productos()
             elif opcion == 2:
@@ -137,38 +237,39 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
                 break
             else:
                 print("Opción inválida.\n")
-# ================================== gestion de clientes con todas sus validaciones ===============================================
+
+# ================================== Gestión de clientes ===============================================
 def crear_cliente(clientes):
     print("\n==== Crear Cliente ====")
     id_cliente = input("ID del cliente: ")
     
-    if not id_cliente.strip(): #valida que este campo no quede vacio 
+    if not id_cliente.strip():
         print("❌ El ID del cliente no puede estar vacío.")
         return
 
-    for cliente in clientes: # valida que el id ingresado no este repetido 
+    for cliente in clientes:
         if cliente['id'] == id_cliente:
             print("❌ Error: El ID ingresado ya existe.\n")
             return
-    # Validar nombre de la empresa
+
     while True:
         empresa = input("Nombre de la Empresa: ").title()
         if validar_nombre(empresa):
             break
         print("❌ El nombre de la empresa solo debe contener letras y espacios.")
-    # Validar representante legal
+
     while True:
         representante = input("Representante legal: ").title()
         if validar_nombre(representante):
             break
         print("❌ El nombre del representante solo debe contener letras y espacios.")
-    # Validar correo
+
     while True:
         correo = input("Correo: ").lower()
         if validar_correo(correo):
             break
         print("❌ Correo inválido. Intenta nuevamente.")
-    # Validar teléfono
+
     while True:
         telefono = input("Teléfono: ")
         if validar_telefono(telefono):
@@ -183,9 +284,10 @@ def crear_cliente(clientes):
         "telefono": telefono,
         "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
-    clientes.append(cliente) #este diccionario se guarda dentro de la lista clientes 
+    clientes.append(cliente)
+    guardar_datos()  # <-- Añadimos esta línea
     print(f"✅ Cliente creado exitosamente el {cliente['fecha']}.\n")
-# consultar clientes ya creados
+
 def consultar_cliente(clientes):
     print("\n==== Consultar Clientes ====")
     buscar_cliente = input("Ingrese el ID o nombre de la empresa a buscar: ").strip().lower()
@@ -194,8 +296,7 @@ def consultar_cliente(clientes):
         print("❌ Debe ingresar un dato para buscar.\n")
         return
 
-    encontrados = []  #Almacena temporalmente todos los clientes que coinciden
-    # con el criterio de búsqueda (ID o nombre de empresa).
+    encontrados = []
     for cliente in clientes:
         id_cliente = cliente["id"].lower()
         nombre_empresa = cliente["empresa"].lower()
@@ -215,19 +316,16 @@ def consultar_cliente(clientes):
             print(f"Fecha Registro: {cliente['fecha']}")
     else:
         print("❌ No se encontraron clientes con ese criterio.\n")
-# modificar clientes ya creados
+
 def modificar_cliente(clientes):
     print("\n==== Modificar Cliente ====")
     
-    # Validar que existan clientes registrados
     if not clientes:
         print("❌ No hay clientes registrados para modificar.\n")
         return
     
-    # Solicitar ID del cliente a modificar
     id_modificar = input("Ingrese el ID del cliente a modificar: ").strip()
     
-    # Buscar cliente
     cliente_encontrado = None
     for cliente in clientes:
         if cliente["id"] == id_modificar:
@@ -238,7 +336,6 @@ def modificar_cliente(clientes):
         print("❌ Cliente no encontrado.\n")
         return
     
-    # Mostrar información actual del cliente
     print("\n📝 Cliente encontrado - Datos actuales:")
     print(f"1. ID: {cliente_encontrado['id']}")
     print(f"2. Empresa: {cliente_encontrado['empresa']}")
@@ -247,8 +344,7 @@ def modificar_cliente(clientes):
     print(f"5. Teléfono: {cliente_encontrado['telefono']}")
     print(f"Fecha Registro: {cliente_encontrado['fecha']}")
     
-    # Menú de campos modificables
-    while True: # FACILITA LA MODIFICACION DEL CLIENTE YA QUE PODEMOS ELEGIR CAMPO SOLICITADO
+    while True:
         print("\nSeleccione el campo a modificar:")
         print("[1] Nombre de la Empresa")
         print("[2] Representante Legal")
@@ -259,7 +355,7 @@ def modificar_cliente(clientes):
         
         opcion = input("Opción: ").strip()
         
-        if opcion == "1":  # Modificar empresa
+        if opcion == "1":
             while True:
                 nueva_empresa = input("Nuevo nombre de la Empresa: ").title()
                 if validar_nombre(nueva_empresa):
@@ -268,7 +364,7 @@ def modificar_cliente(clientes):
                     break
                 print("❌ El nombre de la empresa solo debe contener letras y espacios.")
         
-        elif opcion == "2":  # Modificar representante
+        elif opcion == "2":
             while True:
                 nuevo_representante = input("Nuevo representante legal: ").title()
                 if validar_nombre(nuevo_representante):
@@ -277,7 +373,7 @@ def modificar_cliente(clientes):
                     break
                 print("❌ El nombre del representante solo debe contener letras y espacios.")
         
-        elif opcion == "3":  # Modificar correo
+        elif opcion == "3":
             while True:
                 nuevo_correo = input("Nuevo correo: ").lower()
                 if validar_correo(nuevo_correo):
@@ -286,7 +382,7 @@ def modificar_cliente(clientes):
                     break
                 print("❌ Correo inválido. Intenta nuevamente.")
         
-        elif opcion == "4":  # Modificar teléfono
+        elif opcion == "4":
             while True:
                 nuevo_telefono = input("Nuevo teléfono: ")
                 if validar_telefono(nuevo_telefono):
@@ -295,34 +391,33 @@ def modificar_cliente(clientes):
                     break
                 print("❌ Teléfono inválido. Solo números, de 7 a 15 dígitos.")
         
-        elif opcion == "5":  # Guardar cambios
+        elif opcion == "5":
             cliente_encontrado["fecha"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            guardar_datos()  # <-- Añadimos esta línea
             print("✅ Cambios guardados exitosamente.\n")
             break
         
-        elif opcion == "6":  # Salir sin guardar
+        elif opcion == "6":
             print("❎ Cambios descartados. Volviendo al menú anterior.\n")
             break
         
         else:
             print("❌ Opción inválida. Intente nuevamente.")
 
-#=================================eliminar cliente en caso de que sea necesario
 def eliminar_cliente(clientes):
     print("\n==== Eliminar Cliente ====")
     id_eliminar = input("Ingrese el ID del cliente a eliminar: ").strip()
 
-    cliente_encontrado = None   # variable temporal que almacena el cliente que coincide con el ID buscado
-    for cliente in clientes:    #none indica que el cliente no ha sido encontrado
+    cliente_encontrado = None
+    for cliente in clientes:
         if cliente["id"] == id_eliminar:
             cliente_encontrado = cliente
-            break #detenemos el ciclo para que ya no siga buscando despues de encontarlo
+            break
 
     if not cliente_encontrado:
         print("❌ Cliente no encontrado.\n")
         return
 
-    # ==============================Mostrar información antes de confirmar
     print("\n🗂️ Cliente encontrado:")
     print(f"ID: {cliente_encontrado['id']}")
     print(f"Empresa: {cliente_encontrado['empresa']}")
@@ -334,11 +429,12 @@ def eliminar_cliente(clientes):
     confirmacion = input("\n¿Está seguro que desea eliminar este cliente? (s/n): ").lower()
     if confirmacion == 's':
         clientes.remove(cliente_encontrado)
+        guardar_datos()  # <-- Añadimos esta línea
         print("✅ Cliente eliminado exitosamente.\n")
     else:
         print("❎ Operación cancelada. No se eliminó ningún cliente.\n")
-#================================menu para registrar cliente desde el admin
-def registrar_cliente_admin():# esta funcion mantiene todo el CRUD ya que es de roll administrativo 
+
+def registrar_cliente_admin():
     while True:
         print("\n===== Menú de Gestión de Clientes (Admin) =====")
         print("[1] Crear cliente")
@@ -352,25 +448,20 @@ def registrar_cliente_admin():# esta funcion mantiene todo el CRUD ya que es de 
 
         if opcion == "1":
             crear_cliente(clientes)
-
         elif opcion == "2":
             modificar_cliente(clientes)
-
         elif opcion == "3":
             eliminar_cliente(clientes)
-
         elif opcion == "4":
             consultar_cliente(clientes)
-
         elif opcion == "5":
             print("🔙 Volviendo al menú anterior...\n")
             break
-
         else:
             print("❌ Opción inválida. Intente de nuevo.\n")
-#menu para registrar clientes desde el usuario vendedor
-def registrar_cliente_vendedor(): #esta funcion solo mantiene estas 2 opciones ya presentadas 
-    while True:                     #ya que es el vendedor 
+
+def registrar_cliente_vendedor():
+    while True:
         print("\n===== Menú de Clientes (Vendedor) =====")
         print("[1] Crear cliente")
         print("[2] Consultar clientes")
@@ -381,19 +472,16 @@ def registrar_cliente_vendedor(): #esta funcion solo mantiene estas 2 opciones y
 
         if opcion == "1":
             crear_cliente(clientes)
-
         elif opcion == "2":
             consultar_cliente(clientes)
-
         elif opcion == "3":
             print("🔙 Volviendo al menú anterior...\n")
             break
-
         else:
             print("❌ Opción inválida. Intente de nuevo.\n")
-#==================================================  CRUD GESTION DE PRODUCTOS   =======================================
+
+# ================================== Gestión de Productos ===============================================
 def gestion_de_productos():
-        
     while True:
         print("\n====== MENÚ DE GESTIÓN DE PRODUCTOS ======")
         print("[1] Agregar producto")
@@ -418,56 +506,57 @@ def gestion_de_productos():
         else:
             print("!ERROR¡ Opción no válida. Por favor.")
 
-# Función para generar automáticamente un código de producto único
-def generar_codigo_producto(productos):
-    numero = len(productos) + 1  # Calcula el siguiente número basado en la cantidad de productos existentes
-    return f"PRO{numero:03d}"    # Devuelve un código con formato 'PRO001', 'PRO002', etc.
-
-# Función para agregar un nuevo producto a la lista de productos
 def agregar_producto(productos):
-    print("\n==== Agregar Producto ====")  
-    # Generar ID automáticamente basado en la cantidad de productos
-    id_producto = generar_codigo_producto(productos)
-    print(f"ID generado automáticamente: {id_producto}")  # Muestra el ID generado
-
-    # Validación del nombre del producto (no puede estar vacío)
-    nombre_valido = False #Se usa para repetir el ingreso del nombre del producto hasta que el usuario ingrese algo válido
+    print("\n==== Agregar Producto ====")
+    
+    id_valido = False
+    while not id_valido:
+       id_producto = input("ID del producto: ").strip()
+       
+       if not id_producto:
+           print("El ID no puede estar vacío.")
+       elif not id_producto.isalnum():
+           print("El ID solo puede contener letras y números.")
+       elif any(producto['id'] == id_producto for producto in productos):
+           print("Este ID ya existe. Por favor, ingresa uno diferente.")
+       else:
+           id_valido = True
+    
+    nombre_valido = False
     while not nombre_valido:
-        nombre_producto = input("Nombre del producto: ").strip().title()  # Limpia y convierte a formato título
+        nombre_producto = input("Nombre del producto: ").strip().title()
         if nombre_producto != "":
-            nombre_valido = True  # El nombre es válido
+            nombre_valido = True
         else:
-            print("❌ Error: El nombre no puede estar vacío")  # Mensaje de error si está vacío
-
-    # Solicitar una descripción opcional del producto
+            print("❌ Error: El nombre no puede estar vacío")
+    
     descripcion_producto = input("Descripción: ").strip()
-
-    # Validación del precio (debe ser un número positivo o cero)
+    
     precio_valido = False
     while not precio_valido:
-        precio_input = input("Precio: ").strip()  # Entrada del precio
+        precio_input = input("Precio: ").strip()
         try:
-            precio_producto = float(precio_input)  # Intentar convertir a número flotante
+            precio_producto = float(precio_input)
             if precio_producto >= 0:
-                precio_valido = True  # El precio es válido
+                precio_valido = True
             else:
-                print("❌ Error: El precio no puede ser negativo")  # Precio menor a 0 no es permitido
+                print("❌ Error: El precio no puede ser negativo")
         except ValueError:
-            print("❌ Error: Debe ingresar un número válido")  # Entrada no numérica
+            print("❌ Error: Debe ingresar un número válido")
 
-    # Crear un diccionario que representa al nuevo producto
+    id_producto = generar_codigo()
     nuevo_producto = {
-        "id": id_producto,  # ID generado automáticamente
-        "nombre": nombre_producto,  # Nombre validado
-        "descripcion": descripcion_producto,  # Descripción opcional
-        "precio": precio_producto,  # Precio validado
-        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Fecha y hora actual en formato legible
+        "id": id_producto,
+        "nombre": nombre_producto,
+        "descripcion": descripcion_producto,
+        "precio": precio_producto,
+        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
-
-    productos.append(nuevo_producto)  # Agrega el nuevo producto a la lista de productos
-    print(f"\n✅ Producto '{nombre_producto}' agregado exitosamente!")  # Mensaje de éxito
-    print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")  # Muestra el ID y precio del producto
-
+    
+    productos.append(nuevo_producto)
+    guardar_datos()  # <-- Añadimos esta línea
+    print(f"\n✅ Producto '{nombre_producto}' agregado exitosamente!")
+    print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")
 
 def consultar_producto(productos):
     print("\n==== Consulta de Productos ====")
@@ -492,23 +581,19 @@ def consultar_producto(productos):
         if not producto_encontrado:
             print(f"No se encontró producto con ID '{id_buscar}'.")
 
-def modificar_producto(productos): # FACILITA LA MODIFICACION DEL PRDUCTO YA QUE PODEMOS ELEGIR CAMPO SOLICITADO
+def modificar_producto(productos):
     print("\n==== Modificar Producto ====")
     
-    # Validar que existan productos registrados
     if not productos:
         print("❌ No hay productos registrados para modificar.\n")
         return
     
-    # Mostrar lista de productos disponibles
     print("\n📋 Lista de Productos Disponibles:")
     for producto in productos:
         print(f"ID: {producto['id']} | Nombre: {producto['nombre']} | Precio: ${producto['precio']:.2f}")
     
-    # Solicitar ID del producto a modificar
     id_modificar = input("\nIngrese el ID del producto a modificar: ").strip()
     
-    # Buscar producto
     producto_encontrado = None
     for producto in productos:
         if producto["id"] == id_modificar:
@@ -519,7 +604,6 @@ def modificar_producto(productos): # FACILITA LA MODIFICACION DEL PRDUCTO YA QUE
         print("❌ Producto no encontrado.\n")
         return
     
-    # Mostrar información actual del producto
     print("\n📝 Producto encontrado - Datos actuales:")
     print(f"1. ID: {producto_encontrado['id']}")
     print(f"2. Nombre: {producto_encontrado['nombre']}")
@@ -527,7 +611,6 @@ def modificar_producto(productos): # FACILITA LA MODIFICACION DEL PRDUCTO YA QUE
     print(f"4. Precio: ${producto_encontrado['precio']:.2f}")
     print(f"Fecha Registro: {producto_encontrado['fecha']}")
     
-    # Menú de campos modificables
     while True:
         print("\nSeleccione el campo a modificar:")
         print("[1] Nombre del Producto")
@@ -538,7 +621,7 @@ def modificar_producto(productos): # FACILITA LA MODIFICACION DEL PRDUCTO YA QUE
         
         opcion = input("Opción: ").strip()
         
-        if opcion == "1":  # Modificar nombre
+        if opcion == "1":
             while True:
                 nuevo_nombre = input("Nuevo nombre del producto: ").strip().title()
                 if nuevo_nombre:
@@ -547,12 +630,12 @@ def modificar_producto(productos): # FACILITA LA MODIFICACION DEL PRDUCTO YA QUE
                     break
                 print("❌ El nombre no puede estar vacío.")
         
-        elif opcion == "2":  # Modificar descripción
+        elif opcion == "2":
             nueva_descripcion = input("Nueva descripción: ").strip()
             producto_encontrado["descripcion"] = nueva_descripcion
             print("✅ Descripción actualizada.")
         
-        elif opcion == "3":  # Modificar precio
+        elif opcion == "3":
             while True:
                 nuevo_precio = input("Nuevo precio: ").strip()
                 try:
@@ -565,17 +648,19 @@ def modificar_producto(productos): # FACILITA LA MODIFICACION DEL PRDUCTO YA QUE
                 except ValueError:
                     print("❌ Debe ingresar un número válido para el precio.")
         
-        elif opcion == "4":  # Guardar cambios
+        elif opcion == "4":
             producto_encontrado["fecha"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            guardar_datos()  # <-- Añadimos esta línea
             print("✅ Cambios guardados exitosamente.\n")
             break
         
-        elif opcion == "5":  # Salir sin guardar
+        elif opcion == "5":
             print("❎ Cambios descartados. Volviendo al menú anterior.\n")
             break
         
         else:
             print("❌ Opción inválida. Intente nuevamente.")
+
 def eliminar_producto(productos):
     print("\n==== Eliminar Producto ====")
     
@@ -590,6 +675,7 @@ def eliminar_producto(productos):
             confirmacion_eliminar = input(f"¿Seguro que quieres eliminar '{producto['nombre']}'? (s/n): ").strip().lower()
             if confirmacion_eliminar == "s":
                 productos.pop(indice)
+                guardar_datos()  # <-- Añadimos esta línea
                 print("✅ Producto eliminado correctamente.")
             else:
                 print("Operación cancelada.")
@@ -597,6 +683,7 @@ def eliminar_producto(productos):
     
     print(f"No se encontró producto con ID '{id_producto_eliminar}'.")
 
+# ================================== Gestión de Pedidos ==============================================
 def registrar_pedido():
     print("\n📦 === Registrar Pedido ===")
 
@@ -716,6 +803,8 @@ def registrar_pedido():
 
     print("\n✅ Pedido finalizado y registrado correctamente.\n")
 
+
+
 def listar_pedidos():#=========================================listar pedidos===================
     print("\n==== Listado de Pedidos ====")
     
@@ -744,19 +833,17 @@ def listar_pedidos():#=========================================listar pedidos===
     print("-" * 80)
 
 
-
-
 # ================== FLUJO PRINCIPAL ==================
-def programa():#=======================================================================
+def programa():
+    cargar_datos()  # <-- Añadimos esta línea
     while True:
         resultado = menu_usuario()
         if resultado:
             rol, usuario = resultado
             menu_principal(rol)
         else:
+            guardar_datos()  # <-- Añadimos esta línea
             print("Acceso denegado o máximo de intentos fallidos.")
             break
 
 programa()
-
-# ================== EJECUTAR ==================
