@@ -419,55 +419,72 @@ def gestion_de_productos():
             print("!ERROR¡ Opción no válida. Por favor.")
 
 # Función para generar automáticamente un código de producto único
+import datetime
+
 def generar_codigo_producto(productos):
-    numero = len(productos) + 1  # Calcula el siguiente número basado en la cantidad de productos existentes
-    return f"PRO{numero:03d}"    # Devuelve un código con formato 'PRO001', 'PRO002', etc.
+    """
+    Genera un código de producto único con formato PRO001, PRO002, etc.
+    Verifica que no exista en la lista actual de productos.
+    """
+    numero = len(productos) + 1
+    while True:
+        codigo = f"PRO{numero:03d}"
+        # Verificar si el código ya existe
+        if not any(producto['id'] == codigo for producto in productos):
+            return codigo
+        numero += 1  # Si existe, probamos con el siguiente número
 
-# Función para agregar un nuevo producto a la lista de productos
 def agregar_producto(productos):
-    print("\n==== Agregar Producto ====")  
-    # Generar ID automáticamente basado en la cantidad de productos
+    print("\n==== Agregar Producto ====")
+    
+    # Generar ID único
     id_producto = generar_codigo_producto(productos)
-    print(f"ID generado automáticamente: {id_producto}")  # Muestra el ID generado
+    print(f"ID generado automáticamente: {id_producto}")
 
-    # Validación del nombre del producto (no puede estar vacío)
-    nombre_valido = False #Se usa para repetir el ingreso del nombre del producto hasta que el usuario ingrese algo válido
+    # Validación del nombre
+    nombre_valido = False
     while not nombre_valido:
-        nombre_producto = input("Nombre del producto: ").strip().title()  # Limpia y convierte a formato título
-        if nombre_producto != "":
-            nombre_valido = True  # El nombre es válido
+        nombre_producto = input("Nombre del producto: ").strip().title()
+        if nombre_producto:
+            # Verificar si el nombre ya existe (opcional)
+            if any(p['nombre'].lower() == nombre_producto.lower() for p in productos):
+                print("⚠️ Advertencia: Ya existe un producto con este nombre")
+                confirmacion = input("¿Desea continuar de todos modos? (s/n): ").lower()
+                if confirmacion == 's':
+                    nombre_valido = True
+            else:
+                nombre_valido = True
         else:
-            print("❌ Error: El nombre no puede estar vacío")  # Mensaje de error si está vacío
+            print("❌ Error: El nombre no puede estar vacío")
 
-    # Solicitar una descripción opcional del producto
+    # Resto del código se mantiene igual...
     descripcion_producto = input("Descripción: ").strip()
 
-    # Validación del precio (debe ser un número positivo o cero)
+    # Validación del precio
     precio_valido = False
     while not precio_valido:
-        precio_input = input("Precio: ").strip()  # Entrada del precio
+        precio_input = input("Precio: ").strip()
         try:
-            precio_producto = float(precio_input)  # Intentar convertir a número flotante
+            precio_producto = float(precio_input)
             if precio_producto >= 0:
-                precio_valido = True  # El precio es válido
+                precio_valido = True
             else:
-                print("❌ Error: El precio no puede ser negativo")  # Precio menor a 0 no es permitido
+                print("❌ Error: El precio no puede ser negativo")
         except ValueError:
-            print("❌ Error: Debe ingresar un número válido")  # Entrada no numérica
+            print("❌ Error: Debe ingresar un número válido")
 
-    # Crear un diccionario que representa al nuevo producto
+    # Crear nuevo producto
     nuevo_producto = {
-        "id": id_producto,  # ID generado automáticamente
-        "nombre": nombre_producto,  # Nombre validado
-        "descripcion": descripcion_producto,  # Descripción opcional
-        "precio": precio_producto,  # Precio validado
-        "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Fecha y hora actual en formato legible
+        "id": id_producto,
+        "nombre": nombre_producto,
+        "descripcion": descripcion_producto,
+        "precio": precio_producto,
+        "fecha": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
-    productos.append(nuevo_producto)  # Agrega el nuevo producto a la lista de productos
-    print(f"\n✅ Producto '{nombre_producto}' agregado exitosamente!")  # Mensaje de éxito
-    print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")  # Muestra el ID y precio del producto
-
+    productos.append(nuevo_producto)
+    print(f"\n✅ Producto '{nombre_producto}' agregado exitosamente!")
+    print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")
 
 def consultar_producto(productos):
     print("\n==== Consulta de Productos ====")
