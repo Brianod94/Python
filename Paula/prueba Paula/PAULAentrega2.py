@@ -2,9 +2,9 @@ from datetime import datetime
 import re
 
 # Diccionarios para usuarios 
-user1 = {"Borozco": "admin1234"}
-user2 = {"Kpuerta": "local1234"}
-user3 = {"Jmartinez": "produ1234"}
+user1 = {"bo": "admin1234"}
+user2 = {"kp": "local1234"}
+user3 = {"jm": "produ1234"}
 
 # Listas para almacenar la información
 clientes = []

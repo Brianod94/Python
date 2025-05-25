@@ -8,9 +8,9 @@ colores_disponibles = ["azul", "caqui", "naranja"]
 contador = 0
 # Lista de usuarios existentes
 users = [
-    {"nombre_usuario": "Borozco", "contraseña": "4321", "rol": "admin"},
-    {"nombre_usuario": "Kpuerta", "contraseña": "1234", "rol": "vendedor"},
-    {"nombre_usuario": "Jmarti", "contraseña": "canalete", "rol": "produccion"}
+    {"nombre_usuario": "Bo", "contraseña": "4321", "rol": "admin"},
+    {"nombre_usuario": "Kp", "contraseña": "1234", "rol": "vendedor"},
+    {"nombre_usuario": "Jm", "contraseña": "canalete", "rol": "produccion"}
 ]
 
 roles_permitidos = ['admin', 'vendedor', 'produccion']
@@ -249,7 +249,7 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
             print("Por favor, ingrese un número válido.\n")
             continue
         # Lógica según rol
-        if rol == "admin": # opciones disponibles del admin
+        if rol == "admin": #============================= opciones disponibles del admin
             if opcion == 1:
                 registrar_cliente_admin()
             elif opcion == 2:
@@ -262,7 +262,7 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
             else:
                 print("Opción inválida.\n")
 
-        elif rol == "vendedor": #opciones disponibles del vendedor
+        elif rol == "vendedor": #===========================opciones disponibles del vendedor
 
             if opcion == 1:
                 consultar_productos_disponibles()
