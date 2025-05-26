@@ -1,0 +1,4 @@
+pr002|Enterizo Piloto|prenda drill|120000.0|2025-05-25 19:49:37
+pr003|Camisa Aire|ignifuga de aire|254500.0|2025-05-25 19:50:55
+pr004|Pantalon|pantalon aire|250000.0|2025-05-25 20:21:06
+pr005|Camisa|camisa aire|200000.0|2025-05-25 20:23:16
