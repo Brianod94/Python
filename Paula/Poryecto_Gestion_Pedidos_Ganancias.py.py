@@ -13,14 +13,9 @@ colores_disponibles = ["azul", "caqui", "naranja"]
 contador_ped = 0
 contador_pro = 0
 
-tallas_disponibles = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]
-colores_disponibles = ["azul", "caqui", "naranja"] 
-contador = 0
 # Lista de usuarios existentes
 users = [
-    {"nombre_usuario": "Borozco", "contraseña": "4321", "rol": "admin"},
-    {"nombre_usuario": "Kpuerta", "contraseña": "1234", "rol": "vendedor"},
-    {"nombre_usuario": "Jmarti", "contraseña": "canalete", "rol": "produccion"}
+    {"nombre_usuario": "bo", "contraseña": "4321", "rol": "admin"},
 ]
 
 roles_permitidos = ['admin', 'vendedor', 'produccion']
@@ -43,7 +38,7 @@ def Gestion_usuarios():
         opcion = input("Seleccione una opción: ").strip()
 
         if opcion == "1":
-            registrar_usuario()
+            crear_usuario()
 
         elif opcion == "2":
             consultar_usuarios()
@@ -62,7 +57,7 @@ def Gestion_usuarios():
             print("❌ Opción inválida. Intente de nuevo.\n")
 
 # Registrar nuevo usuario
-def registrar_usuario():
+def crear_usuario():
     nombre_usuario = input("Nombre de usuario: ").strip()
     contraseña = input("Ingrese contraseña: ").strip()
     rol = input("Ingrese el rol asignado (admin, vendedor, produccion): ").strip().lower()
@@ -174,23 +169,29 @@ def guardar_datos():
                 linea = f"{cliente['id']}|{cliente['empresa']}|{cliente['representante']}|{cliente['correo']}|{cliente['telefono']}|{cliente['fecha']}\n"
                 f.write(linea)
         
+        # Guardar usuario
+        with open('usuario.txt', 'w') as f: #open es un metodo que permite trabajar con archivos "W" es modo de apertura para escribir
+            for usuario in users:
+                linea = f"{usuario['nombre_usuario']}|{usuario['contraseña']}|{usuario['rol']}\n"
+                f.write(linea)
+        
         # Guardar productos
         with open('productos.txt', 'w') as f:
             for producto in productos:
-                linea = f"{producto['id']}|{producto['nombre']}|{producto['descripcion']}|{producto['precio']}|{producto['fecha']}\n"
+                linea = f"{producto['id']}|{producto['nombre']}|{producto['descripcion']}|{producto['precio_producto']}|{producto['precio_venta']}|{producto['fecha']}\n"
                 f.write(linea)
         
         # Guardar pedidos
         with open('pedidos.txt', 'w') as f:
             for pedido in pedidos:
-                linea = f"{pedido['fecha']}|{pedido['id_pedido']}|{pedido['id_cliente']}|{pedido['cliente_nombre']}|{pedido['id_producto']}|{pedido['producto_nombre']}|{pedido['color']}|{pedido['talla']}|{pedido['cantidad']}|{pedido['precio_unitario']}|{pedido['subtotal']}|{pedido['iva']}|{pedido['total']}\n"
+                linea = f"{pedido['fecha']}|{pedido['id_pedido']}|{pedido['id_cliente']}|{pedido['cliente_nombre']}|{pedido['id_producto']}|{pedido['producto_nombre']}|{pedido['color']}|{pedido['talla']}|{pedido['cantidad']}|{producto['precio_producto']}|{producto['precio_venta']}|{pedido['subtotal']}|{pedido['precio_unitario_ven']}|{pedido['iva']}|{pedido['total']}|{pedido['total_ganancia']}\n"
                 f.write(linea)
     except Exception as e:
         print(f"Error al guardar datos: {e}")
 
 def cargar_datos():
     """Carga los datos desde archivos .txt al iniciar el programa"""
-    global clientes, productos, pedidos
+    global clientes, productos, pedidos, users
     
     # Cargar clientes
     try:
@@ -207,6 +208,19 @@ def cargar_datos():
                 })
     except FileNotFoundError:
         print("Archivo de clientes no encontrado. Se creará uno nuevo.")
+
+    # Cargar Usurios
+    try:
+        with open('usuario.txt', 'r') as f:
+            for linea in f:
+                datos = linea.strip().split('|')
+                users.append({
+                    'nombre_usuario': datos[0],
+                    'contraseña': datos[1],
+                    'rol': datos[2]
+                })
+    except FileNotFoundError:
+        print("Archivo de Usuarios no encontrado. Se creará uno nuevo.")
     
     # Cargar productos
     try:
@@ -217,8 +231,9 @@ def cargar_datos():
                     'id': datos[0],
                     'nombre': datos[1],
                     'descripcion': datos[2],
-                    'precio': float(datos[3]),
-                    'fecha': datos[4]
+                    'precio_producto': float(datos[3]),
+                    'precio_venta': float(datos[4]),
+                    'fecha': datos[5]
                 })
     except FileNotFoundError:
         print("Archivo de productos no encontrado. Se creará uno nuevo.")
@@ -238,10 +253,14 @@ def cargar_datos():
                     'color': datos[6],
                     'talla': datos[7],
                     'cantidad': datos[8],
-                    'precio_unitario': float(datos[9]),
-                    'subtotal': float(datos[10]),
-                    'iva': float(datos[11]),
-                    'total': datos[12]
+                    'precio_producto': float(datos[9]),
+                    'precio_venta': float(datos[10]),
+                    'subtotal': float(datos[11]),
+                    'precio_unitario_ven':float(datos[12]),
+                    'iva': float(datos[13]),
+                    'total': float(datos[14]),
+                    'total_ganancia': float(datos[15])
+                    
                 })
     except FileNotFoundError:
         print("Archivo de pedidos no encontrado. Se creará uno nuevo.")
@@ -363,8 +382,8 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
 
         if rol == "admin":
             print("[1] Gestión de Clientes")
-            print("[2] Valores Definitivos (Pedidos)")
-            print("[3] registrar nuevos usuarios")
+            print("[2] Gestion de Usuarios")
+            print("[3] Gestion de Informes")
             print("[4] Cerrar Sesión")
 
         elif rol == "vendedor":
@@ -391,6 +410,8 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
             if opcion == 1:
                 registrar_cliente_admin()
             elif opcion == 2:
+                Gestion_usuarios()
+            elif opcion == 3:
                 while True:
                     print("\n===== Menú de Pedidos (Admin) =====")
                     print("[1] Listar todos los pedidos")
@@ -406,10 +427,7 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
                     elif sub_opcion == "3":
                         break
                     else:
-                        print("❌ Opción inválida. Intente de nuevo.\n")              
-                
-            elif opcion == 3:
-                Gestion_usuarios()
+                        print("❌ Opción inválida. Intente de nuevo.\n")
             elif opcion == 4:
                 print("Cerrando sesión...\n")
                 break
@@ -419,7 +437,7 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
         elif rol == "vendedor": #opciones disponibles del vendedor
 
             if opcion == 1:
-                consultar_producto()
+                consultar_producto(productos)
             elif opcion == 2:
                 registrar_pedido()
             elif opcion == 3:
@@ -733,13 +751,27 @@ def agregar_producto(productos):
     
     descripcion_producto = input("Descripción: ").strip()
     
-    precio_valido = False
-    while not precio_valido:
-        precio_input = input("Precio: ").strip()
+    
+
+    precio_val_pro = False
+    while not precio_val_pro:
+        precio_input = input("Precio Producto: ").strip()
         try:
             precio_producto = float(precio_input)
             if precio_producto >= 0:
-                precio_valido = True
+                precio_val_pro= True
+            else:
+                print("❌ Error: El precio no puede ser negativo")
+        except ValueError:
+            print("❌ Error: Debe ingresar un número válido")
+
+    precio_val_ven = False
+    while not precio_val_ven:
+        precio_input = input("Precio venta: ").strip()
+        try:
+            precio_venta = float(precio_input)
+            if precio_venta >= 0:
+                precio_val_ven = True
             else:
                 print("❌ Error: El precio no puede ser negativo")
         except ValueError:
@@ -750,14 +782,15 @@ def agregar_producto(productos):
         "id": id_producto,
         "nombre": nombre_producto,
         "descripcion": descripcion_producto,
-        "precio": precio_producto,
+        "precio_producto" : precio_producto,
+        "precio_venta": precio_venta,
         "fecha": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
     
     productos.append(nuevo_producto)
-    guardar_datos()  # <-- Añadimos esta línea
+    guardar_datos() 
     print(f"\n✅ Producto '{nombre_producto}' agregado exitosamente!")
-    print(f"ID: {id_producto} | Precio: ${precio_producto:.2f}\n")
+    print(f"ID: {id_producto} | Precio: ${precio_venta:.2f}\n")
 
 def consultar_producto(productos):
     print("\n==== Consulta de Productos ====")
@@ -770,12 +803,12 @@ def consultar_producto(productos):
     
     if id_buscar == "":
         for producto in productos:
-            print(f"ID: {producto['id']} | Nombre: {producto['nombre']} | Precio: ${producto['precio']:.2f} | Fecha: {producto['fecha']}")
+            print(f"ID: {producto['id']} | Nombre: {producto['nombre']} | Precio: ${producto['precio_venta']:.2f} | Fecha: {producto['fecha']}")
     else:
         producto_encontrado = False
         for producto in productos:
             if producto['id'] == id_buscar:
-                print(f"ID: {producto['id']}\nNombre: {producto['nombre']}\nDescripción: {producto['descripcion']}\nPrecio: ${producto['precio']:.2f}\nFecha: {producto['fecha']}")
+                print(f"ID: {producto['id']}\nNombre: {producto['nombre']}\nDescripción: {producto['descripcion']}\nPrecio: ${producto['precio_venta']:.2f}\nFecha: {producto['fecha']}")
                 producto_encontrado = True
                 break
         
@@ -791,7 +824,7 @@ def modificar_producto(productos):
     
     print("\n📋 Lista de Productos Disponibles:")
     for producto in productos:
-        print(f"ID: {producto['id']} | Nombre: {producto['nombre']} | Precio: ${producto['precio']:.2f}")
+        print(f"ID: {producto['id']} | Nombre: {producto['nombre']} | Precio: ${producto['precio_venta']:.2f}")
     
     id_modificar = input("\nIngrese el ID del producto a modificar: ").strip()
     
@@ -809,16 +842,18 @@ def modificar_producto(productos):
     print(f"1. ID: {producto_encontrado['id']}")
     print(f"2. Nombre: {producto_encontrado['nombre']}")
     print(f"3. Descripción: {producto_encontrado['descripcion']}")
-    print(f"4. Precio: ${producto_encontrado['precio']:.2f}")
+    print(f"4. Precio: ${producto_encontrado['precio_producto']:.2f}")
+    print(f"5. Precio: ${producto_encontrado['precio_venta']:.2f}")
     print(f"Fecha Registro: {producto_encontrado['fecha']}")
     
     while True:
         print("\nSeleccione el campo a modificar:")
         print("[1] Nombre del Producto")
         print("[2] Descripción")
-        print("[3] Precio")
-        print("[4] Guardar cambios y salir")
-        print("[5] Salir sin guardar")
+        print("[3] Precio Producto")
+        print("[4] Precio Venta")
+        print("[5] Guardar cambios y salir")
+        print("[6] Salir sin guardar")
         
         opcion = input("Opción: ").strip()
         
@@ -842,20 +877,33 @@ def modificar_producto(productos):
                 try:
                     precio_float = float(nuevo_precio)
                     if precio_float >= 0:
-                        producto_encontrado["precio"] = precio_float
+                        producto_encontrado["precio_producto"] = precio_float
+                        print("✅ Precio actualizado.")
+                        break
+                    print("❌ El precio no puede ser negativo.")
+                except ValueError:
+                    print("❌ Debe ingresar un número válido para el precio.")
+
+        elif opcion == "4":
+            while True:
+                nuevo_precio = input("Nuevo precio: ").strip()
+                try:
+                    precio_float = float(nuevo_precio)
+                    if precio_float >= 0:
+                        producto_encontrado["precio_venta"] = precio_float
                         print("✅ Precio actualizado.")
                         break
                     print("❌ El precio no puede ser negativo.")
                 except ValueError:
                     print("❌ Debe ingresar un número válido para el precio.")
         
-        elif opcion == "4":
+        elif opcion == "5":
             producto_encontrado["fecha"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            guardar_datos()  # <-- Añadimos esta línea
+            guardar_datos()
             print("✅ Cambios guardados exitosamente.\n")
             break
         
-        elif opcion == "5":
+        elif opcion == "6":
             print("❎ Cambios descartados. Volviendo al menú anterior.\n")
             break
         
@@ -876,7 +924,7 @@ def eliminar_producto(productos):
             confirmacion_eliminar = input(f"¿Seguro que quieres eliminar '{producto['nombre']}'? (s/n): ").strip().lower()
             if confirmacion_eliminar == "s":
                 productos.pop(indice)
-                guardar_datos()  # <-- Añadimos esta línea
+                guardar_datos()
                 print("✅ Producto eliminado correctamente.")
             else:
                 print("Operación cancelada.")
@@ -917,7 +965,7 @@ def registrar_pedido():
         # Menú de productos
         print("\n🛍️ Productos disponibles:")
         for indice, producto in enumerate(productos, start=1):
-            print(f"{indice}. {producto['nombre']} - ${producto['precio']:,} (ID: {producto['id']})")
+            print(f"{indice}. {producto['nombre']} - ${producto['precio_venta']:,} (ID: {producto['id']})")
 
         producto_encontrado = None
         while producto_encontrado is None:
@@ -971,10 +1019,13 @@ def registrar_pedido():
             continue
 
         # Cálculos
-        precio_unitario = producto_encontrado["precio"]
-        subtotal = cantidad_ingresada * precio_unitario
+        precio_unitario_ven = producto_encontrado["precio_venta"]
+        precio_unitario_pro = producto_encontrado["precio_producto"]
+        ganacia = cantidad_ingresada * precio_unitario_pro
+        subtotal = cantidad_ingresada * precio_unitario_ven
         iva = subtotal * 0.19
         total = subtotal + iva
+        total_gan = subtotal - ganacia
 
         # Crear pedido
         id_pedido = generar_codigo_pedido()
@@ -988,9 +1039,12 @@ def registrar_pedido():
             "color": color_ingresado,
             "talla": talla_ingresada,
             "cantidad": cantidad_ingresada,
-            "precio_unitario": precio_unitario,
+            "precio_unitario_pro" : precio_unitario_pro,
+            "precio_unitario_ven": precio_unitario_ven,
+            "ganacia" : ganacia,
             "subtotal": subtotal,
             "iva": iva,
+            "total_ganancia" : total_gan,
             "total": total
         }
 
@@ -1009,32 +1063,36 @@ def registrar_pedido():
 
 
 def listar_pedidos():#=========================================listar pedidos===================
-    print("\n==== Listado de Pedidos ====")
+    print("\n","=" * 55," Listado de Pedidos ","=" * 55)
     
     if not pedidos:
         print("No hay pedidos registrados.")
         return
     
     # Encabezado
-    print("-" * 80)
-    print(f"{'Fecha':<20} | {'id_pedido':>6} | {'Cliente':<20} | {'Producto':<20} | {'Cantidad':>10} | {'Total':>10}")
-    print("-" * 80)
+    print("-" * 134)
+    print(f"{'Fecha':^20} | {'id_pedido':<9} | {'Cliente':^30} | {'Producto':^17} | {'Cantidad':>8} | {'Total':^15} | {'Total_Ganancia':^15} | ")
+    print("-" * 134)
     
     for pedido in pedidos:
         print(
             f"{pedido['fecha']:<20} | "
-            f"{pedido['id_pedido']:1>6} | "
-            f"{pedido['cliente_nombre']:<20} | "
-            f"{pedido['producto_nombre']:<20} | "
-            f"{pedido['cantidad']:>10} | "
-            f"${pedido['total']:>9.2f}"
+            f"{pedido['id_pedido']:^9} | "
+            f"{pedido['cliente_nombre']:<30} | "
+            f"{pedido['producto_nombre']:<17} | "
+            f"{pedido['cantidad']:^8} | "
+            f"${float(pedido['total']):>14,} | "
+            f"${float(pedido['total_ganancia']):>14,} | "
+           
         )
     
     # Total general
     total_general = sum(p['total'] for p in pedidos)
-    print("-" * 80)
-    print(f"{'TOTAL GENERAL:':<63} ${total_general:>9.2f}")
-    print("-" * 80)
+    total_gen_gan = sum(p['total_ganancia'] for p in pedidos)
+    print("-" * 134)
+    print(f"{'TOTAL GENERAL:':<116} ${float(total_general):>14,} | ")
+    print(f"{'TOTAL GANACIA:':<116} ${float(total_gen_gan):>14,} | ")
+    print("-" * 134)
 
 def reporte_pedidos_por_fecha():
     print("\n📅 === Reporte de Pedidos por Rango de Fechas ===")
@@ -1080,27 +1138,33 @@ def reporte_pedidos_por_fecha():
     
     # Mostrar resultados
     print(f"\n📊 REPORTE DE PEDIDOS ({fecha_inicio} a {fecha_fin})")
-    print("=" * 100)
-    print(f"{'Fecha':<20} | {'id_pedido':>6} | {'Cliente':<20} | {'Producto':<20} | {'Color':<10} | {'Talla':<6} | {'Cant.':>6} | {'Total':>12}")
-    print("=" * 100)
+    print("=" * 183)
+    print(f"{'Fecha':^19} | {'id_pedido':^9} | {'Cliente':^30} | {'Producto':^20} | {'Color':^7} | {'Talla':^5} | {'Cant.':^5} | {'Valor Unitario':^15} | {'Iva':^14} | {'Total':^13} | {'Ganancia':^14} | ")
+    print("=" * 183)
     
     total_general = 0
     for pedido in pedidos_filtrados:
         print(
-            f"{pedido['fecha']:<20} | "
-            f"{pedido['id_pedido']:>6} | "
-            f"{pedido['cliente_nombre']:<20} | "
-            f"{pedido['producto_nombre']:<20} | "
-            f"{pedido['color']:<10} | "
-            f"{pedido['talla']:<6} | "
-            f"{pedido['cantidad']:>6} | "
-            f"${float(pedido['total']):>11.2f}"
+            f"{pedido['fecha']:<19} | "
+            f"{pedido['id_pedido']:^9} | "
+            f"{pedido['cliente_nombre']:<30} | "
+            f"{pedido['producto_nombre']:^20} | "
+            f"{pedido['color']:^7} | "
+            f"{pedido['talla']:^5} | "
+            f"{pedido['cantidad']:^5} | "
+            f"${pedido['precio_unitario_ven']:>14,} | "
+            f"${pedido['iva']:>13,} | "
+            f"${float(pedido['total']):>12,} | "
+            f"${float(pedido['total_ganancia']):>13,} | "
         )
         total_general += float(pedido['total'])
+        total_gen = sum(p['total_ganancia'] for p in pedidos)
+        #total_gen += float(pedido['total_ganancia'])
     
-    print("=" * 100)
-    print(f"{'TOTAL GENERAL:':<80} ${total_general:>11.2f}")
-    print("=" * 100)
+    print("=" * 183)
+    print(f"{'TOTAL GENERAL:':<165} ${total_general:>14,} |")
+    print(f"{'TOTAL GANANCIA:':<165} ${total_gen:>14,} |")
+    print("=" * 183)
     
     # Opción para exportar a archivo
     exportar = input("\n¿Desea exportar este reporte a un archivo? (s/n): ").strip().lower()
@@ -1109,24 +1173,27 @@ def reporte_pedidos_por_fecha():
         try:
             with open(nombre_archivo, 'w') as f:
                 f.write(f"REPORTE DE PEDIDOS ({fecha_inicio} a {fecha_fin})\n")
-                f.write("=" * 100 + "\n")
-                f.write(f"{'Fecha':<20} | {'Cliente':<20} | {'Producto':<20} | {'Color':<10} | {'Talla':<6} | {'Cant.':>6} | {'Total':>12}\n")
-                f.write("=" * 100 + "\n")
+                f.write("=" * 150 + "\n")
+                f.write(f"{'Fecha':<20} | {'id_pedido':>10} | {'Cliente':<30} | {'Producto':<20} | {'Color':<10} | {'Talla':<6} | {'Cant.':>6} | {'Total':>12} | {'Total_Ganancia':<15}")
+                f.write("=" * 150 + "\n")
                 
                 for pedido in pedidos_filtrados:
                     f.write(
                         f"{pedido['fecha']:<20} | "
-                        f"{pedido['cliente_nombre']:<20} | "
+                        f"{pedido['id_pedido']:>10} | "
+                        f"{pedido['cliente_nombre']:<30} | "
                         f"{pedido['producto_nombre']:<20} | "
                         f"{pedido['color']:<10} | "
                         f"{pedido['talla']:<6} | "
                         f"{pedido['cantidad']:>6} | "
-                        f"${pedido['total']:>11.2f}\n"
+                        f"${float(pedido['total']):>12,} | " 
+                        f"${float(pedido['Total_Ganancia']):<15,}"
                     )
                 
-                f.write("=" * 100 + "\n")
-                f.write(f"{'TOTAL GENERAL:':<80} ${total_general:>11.2f}\n")
-                f.write("=" * 100 + "\n")
+                f.write("=" * 150 + "\n")
+                f.write(f"{'TOTAL GENERAL:':<80} ${total_general:>12,}\n")
+                f.write(f"{'TOTAL GENERAL:':<80} ${total_general:>12,}\n")
+                f.write("=" * 150 + "\n")
             
             print(f"✅ Reporte exportado correctamente como '{nombre_archivo}'")
         except Exception as e:
@@ -1136,14 +1203,14 @@ def reporte_pedidos_por_fecha():
 def programa():
     cargar_datos()
     cargar_contadores_ped()
-    cargar_contadores_pro()# <-- Añadimos esta línea
+    cargar_contadores_pro()
     while True:
         resultado = menu_usuario()
         if resultado:
             rol, usuario = resultado
             menu_principal(rol)
         else:
-            guardar_datos()  # <-- Añadimos esta línea
+            guardar_datos()
             print("Acceso denegado o máximo de intentos fallidos.")
             break
 
