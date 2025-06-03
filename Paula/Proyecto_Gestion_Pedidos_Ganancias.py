@@ -1,11 +1,11 @@
 from datetime import datetime
 import re
-#import uuid 
 
 # Listas para almacenar la información
 clientes = []
 pedidos = []    
 productos = []
+roles_permitidos = ['admin', 'vendedor', 'produccion']
 
 # Listas con las tallas y colores disponibles
 tallas_disponibles = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]
@@ -18,7 +18,6 @@ users = [
     {"nombre_usuario": "bo", "contraseña": "4321", "rol": "admin"},
 ]
 
-roles_permitidos = ['admin', 'vendedor', 'produccion']
 
 # Función para validar rol
 def rol_es_valido(rol):
@@ -60,7 +59,34 @@ def Gestion_usuarios():
 def crear_usuario():
     nombre_usuario = input("Nombre de usuario: ").strip()
     contraseña = input("Ingrese contraseña: ").strip()
-    rol = input("Ingrese el rol asignado (admin, vendedor, produccion): ").strip().lower()
+    # Bucle infinito para asegurar que el usuario seleccione una opción válida
+    while True:
+        # Mostramos las opciones de roles disponibles
+        print("\nSeleccione el rol asignado:")
+        print("1. Administrador")
+        print("2. Vendedor")
+        print("3. Producción")
+
+        # Solicitamos al usuario que ingrese el número correspondiente al rol
+        opcion = input("Ingrese el número correspondiente al rol: ").strip()
+
+        # Verificamos qué número ingresó el usuario y asignamos el rol correspondiente
+        if opcion == "1":
+            rol = "admin"  # Se asigna 'admin' si elige 1
+            break           # Salimos del bucle porque ya seleccionó un rol válido
+        elif opcion == "2":
+            rol = "vendedor"  # Se asigna 'vendedor' si elige 2
+            break             # Salimos del bucle
+        elif opcion == "3":
+            rol = "produccion"  # Se asigna 'produccion' si elige 3
+            break               # Salimos del bucle
+        else:
+            # Si el número ingresado no es válido, mostramos un mensaje de advertencia
+            print("⚠️ Opción inválida. Por favor, seleccione una opción válida (1, 2 o 3).")
+
+    # Mostramos el rol que fue seleccionado correctamente
+    print(f"✅ Rol seleccionado: {rol}")
+
 
     if any(u['nombre_usuario'] == nombre_usuario for u in users):
         print(f"❌ El usuario '{nombre_usuario}' ya existe.")
@@ -76,6 +102,7 @@ def crear_usuario():
         "rol": rol
     }
     users.append(nuevo_usuario)
+    guardar_datos()  # ==================te falto esta linea en crear usuario
     print(f"✅ Usuario '{nombre_usuario}' registrado como '{rol}'.")
 
 # Consultar usuarios
@@ -231,8 +258,8 @@ def cargar_datos():
                     'id': datos[0],
                     'nombre': datos[1],
                     'descripcion': datos[2],
-                    'precio_producto': float(datos[3]),
-                    'precio_venta': float(datos[4]),
+                    'precio_producto': datos[3],
+                    'precio_venta': datos[4],
                     'fecha': datos[5]
                 })
     except FileNotFoundError:
@@ -394,7 +421,8 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
 
         elif rol == "produccion":
             print("[1] Gestión de productos")
-            print("[2] Cerrar Sesión")
+            print("[2] Lista de Pedidos")
+            print("[3] Cerrar Sesión")
 
         else:
             print("Rol desconocido. Cerrando sesión.")
@@ -452,6 +480,9 @@ def menu_principal(rol):  # menu principal deacuerdo al roll seleccionado
             if opcion == 1:
                 gestion_de_productos()
             elif opcion == 2:
+                print("listado de pedidos\n")
+                listar_pedidos()
+            elif opcion == 3:
                 print("Cerrando sesión...\n")
                 break
             else:
@@ -727,20 +758,7 @@ def gestion_de_productos():
 
 def agregar_producto(productos):
     print("\n==== Agregar Producto ====")
-    
-    #id_valido = False
-    #while not id_valido:
-       #id_producto = input("ID del producto: ").strip()
-       
-       #if not id_producto:
-           #print("El ID no puede estar vacío.")
-       #elif not id_producto.isalnum():
-           #print("El ID solo puede contener letras y números.")
-       #elif any(producto['id'] == id_producto for producto in productos):
-           #print("Este ID ya existe. Por favor, ingresa uno diferente.")
-       #else:
-           #id_valido = True
-    
+   
     nombre_valido = False
     while not nombre_valido:
         nombre_producto = input("Nombre del producto: ").strip().title()
@@ -755,9 +773,9 @@ def agregar_producto(productos):
 
     precio_val_pro = False
     while not precio_val_pro:
-        precio_input = input("Precio Producto: ").strip()
+        precio_input = float(input("Precio Producto: "))
         try:
-            precio_producto = float(precio_input)
+            precio_producto = (precio_input)
             if precio_producto >= 0:
                 precio_val_pro= True
             else:
@@ -766,11 +784,12 @@ def agregar_producto(productos):
             print("❌ Error: Debe ingresar un número válido")
 
     precio_val_ven = False
+
     while not precio_val_ven:
-        precio_input = input("Precio venta: ").strip()
         try:
-            precio_venta = float(precio_input)
-            if precio_venta >= 0:
+            precio_input = float(input("Precio venta: ").strip())  # ahora dentro del try
+            if precio_input >= 0:
+                precio_venta = precio_input
                 precio_val_ven = True
             else:
                 print("❌ Error: El precio no puede ser negativo")
@@ -803,7 +822,7 @@ def consultar_producto(productos):
     
     if id_buscar == "":
         for producto in productos:
-            print(f"ID: {producto['id']} | Nombre: {producto['nombre']} | Precio: ${producto['precio_venta']:.2f} | Fecha: {producto['fecha']}")
+            print(f"ID: {producto['id']} | Nombre: {producto['nombre']} | Precio: ${producto['precio_venta']} | Fecha: {producto['fecha']}")
     else:
         producto_encontrado = False
         for producto in productos:
@@ -965,7 +984,7 @@ def registrar_pedido():
         # Menú de productos
         print("\n🛍️ Productos disponibles:")
         for indice, producto in enumerate(productos, start=1):
-            print(f"{indice}. {producto['nombre']} - ${producto['precio_venta']:,} (ID: {producto['id']})")
+            print(f"{indice}. {producto['nombre']} - ${producto['precio_venta']} (ID: {producto['id']})")
 
         producto_encontrado = None
         while producto_encontrado is None:
@@ -1019,13 +1038,13 @@ def registrar_pedido():
             continue
 
         # Cálculos
-        precio_unitario_ven = producto_encontrado["precio_venta"]
-        precio_unitario_pro = producto_encontrado["precio_producto"]
-        ganacia = cantidad_ingresada * precio_unitario_pro
-        subtotal = cantidad_ingresada * precio_unitario_ven
+        precio_unitario_ven = float(producto_encontrado["precio_venta"])
+        precio_unitario_pro = float(producto_encontrado["precio_producto"])
+        ganancia = int(cantidad_ingresada) * precio_unitario_pro
+        subtotal = int(cantidad_ingresada) * precio_unitario_ven
         iva = subtotal * 0.19
         total = subtotal + iva
-        total_gan = subtotal - ganacia
+        total_gan = subtotal - ganancia
 
         # Crear pedido
         id_pedido = generar_codigo_pedido()
@@ -1041,7 +1060,7 @@ def registrar_pedido():
             "cantidad": cantidad_ingresada,
             "precio_unitario_pro" : precio_unitario_pro,
             "precio_unitario_ven": precio_unitario_ven,
-            "ganacia" : ganacia,
+            "ganancia" : ganancia,
             "subtotal": subtotal,
             "iva": iva,
             "total_ganancia" : total_gan,

@@ -1,0 +1,5 @@
+bo|4321|admin
+bo|4321|admin
+bo|4321|admin
+ao|qwerty|vendedor
+bd|qwerty|produccion
