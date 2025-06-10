@@ -34,7 +34,7 @@ def Gestion_usuarios():
         print("[5] Salir")
         print("=======================================")
 
-        opcion = input("Seleccione una opción: ").strip()
+        opcion = input("Seleccione una opción: ").strip()# este metdo elimina los espacios y carcateres especiales de ambos lados
 
         if opcion == "1":
             crear_usuario()

@@ -1,59 +1,82 @@
-#Mensaje de bienvenida.
-print("*****************************************************")
-print("********🫡  Bienvenido a Pizza Bella Napoli 🍕**********\n\n")
+def mostrar_menu_principal():
+    print("\n*****************************************************")
+    print("¿Qué tipo de pizza desea ordenar?")
+    print("[1] Vegetariana 🥬")
+    print("[2] No vegetariana 🍖")
+    print("[3] Salir 👋")
+    print("*****************************************************")
 
-opciones = 0
+def mostrar_ingredientes_vegetarianos():
+    print("\nIngrese el número del ingrediente adicional:")
+    print("[1] Pimiento 🫑")
+    print("[2] Champiñón 🍄")
+    print("[3] Otro ➕")
 
-while opciones != "3":
-    print("¿Ingrese numero del Tipo pizza que desea ordenar?\n")
-    print("[1] Vegetariana. 🥬")
-    print("[2] No vegetariana. 🍖")
-    print("[3] Salir. 👋")
-    print("\n*****************************************************\n")
+def mostrar_ingredientes_no_vegetarianos():
+    print("\nIngrese el número del ingrediente adicional:")
+    print("[1] Peperoni 🥓")
+    print("[2] Jamón 🥩")
+    print("[3] Salmón 🍣")
+    print("[4] Otro ➕")
 
-    opciones = input("¿Opcion? = ")
-    
-    #desicion sobre el tipo de pizza 
-    if opciones =="1": # opcion 1 vegetariana 
-        print("Ingrese el numero del ingrediente adicional\n\n[1] Pimiento🫑\n[2] Champiñon🍄‍🟫\n[3] Otro➕.")
-        ingrediente=input("¿Opcion? = ")
-            #solicitud de ingredientes adicionales ***************************************2
-        if  ingrediente=="1":
-            print("\nUsted ordeno una pizza vegetariena con mozarella🧀, tomate🍅 y pimiento🫑\n")
+def obtener_opcion(mensaje, opciones_validas):
+    while True:
+        opcion = input(mensaje).strip()
+        if opcion in opciones_validas:
+            return opcion
+        print(f"¡Error! Opción no válida. Por favor ingrese {', '.join(opciones_validas)}")
 
-        elif ingrediente=="2":
-            print("\nUsted ordeno una pizza vegetariena con mozarella🧀, tomate🍅 y champiñon🍄‍🟫\n")
+def main():
+    # Mensaje de bienvenida
+    print("*****************************************************")
+    print("********🫡 Bienvenido a Pizza Bella Napoli 🍕********")
+    print("*****************************************************")
 
-        elif ingrediente=="3":
-            otro = input("Ingrese el ingrediente que desea agregar: ")
-            print(f"\nUsted ordeno una pizza vegetariena con mozarella🧀, tomate🍅 y {otro}\n")
+    ingredientes_vegetarianos = {
+        '1': ('Pimiento', '🫑'),
+        '2': ('Champiñón', '🍄'),
+        '3': ('Otro', '➕')
+    }
 
-        else:
-            print("\n!❌ERROR¡ ingrediente no encontrado\n")
+    ingredientes_no_vegetarianos = {
+        '1': ('Peperoni', '🥓'),
+        '2': ('Jamón', '🥩'),
+        '3': ('Salmón', '🍣'),
+        '4': ('Otro', '➕')
+    }
 
-    elif opciones =="2": # opcion 2 no vegetariana 
-        print("Ingrese numero del ingrediente adiccional.\n[1] Peperoni🥓\n[2] Jamon🥩\n[3] Salmon🍣\n[4] Otro➕.")
-        ingrediente = input("¿opcion? = ")
-            #solicitud de ingredientes adicionales ****************************************
-        if ingrediente=="1":
-            print("\nUsted ordeno una pizza no vegetariena y es con mozarella🧀, tomate🍅 y peperoni🥓\n")
-        
-        elif ingrediente=="2":
-            print("\nUsted ordeno una pizza no vegetariena y es con mozarella🧀, tomate🍅 y jamon🥩\n")
-        
-        elif ingrediente=="3":
-            print("\nUsted ordeno una pizza no vegetariena y es con mozarella🧀, tomate🍅 y salmon🍣\n")
+    while True:
+        mostrar_menu_principal()
+        opcion = obtener_opcion("Opción: ", ['1', '2', '3'])
 
-        elif ingrediente=="4":
-            otro = input("Ingrese el ingrediente que desea agregar: ")
-            print(f"\nUsted ordeno una pizza no vegetariena y es con mozarella🧀, tomate🍅 y {otro}\n")
-        
-        else:
-            print("\n!❌ERROR¡ ingrediente no encontrado\n")
+        if opcion == '1':  # Pizza vegetariana
+            mostrar_ingredientes_vegetarianos()
+            ingrediente = obtener_opcion("Opción: ", ['1', '2', '3'])
+            
+            if ingrediente == '3':
+                otro_ingrediente = input("Ingrese el ingrediente que desea agregar: ").strip()
+                nombre_ingrediente, emoji = otro_ingrediente, "➕"
+            else:
+                nombre_ingrediente, emoji = ingredientes_vegetarianos[ingrediente]
+            
+            print(f"\nUsted ordenó una pizza vegetariana con mozzarella 🧀, tomate 🍅 y {nombre_ingrediente} {emoji}\n")
 
-    elif opciones == "3": # salir del programa
-        print("¡Nos alegra que nos visitaran!🤗\n")
-        print("GRACIAS POR SU VISITA VUELVA PRONTO😋")
+        elif opcion == '2':  # Pizza no vegetariana
+            mostrar_ingredientes_no_vegetarianos()
+            ingrediente = obtener_opcion("Opción: ", ['1', '2', '3', '4'])
+            
+            if ingrediente == '4':
+                otro_ingrediente = input("Ingrese el ingrediente que desea agregar: ").strip()
+                nombre_ingrediente, emoji = otro_ingrediente, "➕"
+            else:
+                nombre_ingrediente, emoji = ingredientes_no_vegetarianos[ingrediente]
+            
+            print(f"\nUsted ordenó una pizza no vegetariana con mozzarella 🧀, tomate 🍅 y {nombre_ingrediente} {emoji}\n")
 
-    else:
-        print("!❌ERROR¡ opcion no encontrada\n")
+        elif opcion == '3':  # Salir
+            print("\n¡Gracias por visitar Pizza Bella Napoli! 🤗")
+            print("Vuelva pronto 😋\n")
+            break
+
+if __name__ == "__main__":
+    main()
